@@ -70,23 +70,28 @@ router.post('/register', async (req, res) => {
         // Build verification URL
         const verificationUrl = `${baseUrl}/users/verify/${token}`;
 
-        // Send email
-        await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL,
-            to: newUser.email,
-            subject: "Verify your account",
-            html: `
-                <h2>Welcome, ${newUser.firstName}!</h2>
-                <p>Please verify your email:</p>
-                <a href="${verificationUrl}">${verificationUrl}</a>
-            `
-        });
+        try {
+            // Send email
+            await resend.emails.send({
+                from: process.env.RESEND_FROM_EMAIL,
+                to: newUser.email,
+                subject: "Verify your account",
+                html: `
+                    <h2>Welcome, ${newUser.firstName}!</h2>
+                    <p>Please verify your email:</p>
+                    <a href="${verificationUrl}">${verificationUrl}</a>
+                `
+            });
 
-        return res.send("Registration successful! Please check your email to verify your account.");
+            return res.send("Registration successful! Please check your email to verify your account.");
+        } catch (emailErr) {
+            console.error("Failed to send verification email:", emailErr);
+            return res.send("Registration successful, but failed to send verification email. Please contact support.");
+        }
 
     } catch (err) {
         console.error("Error during registration:", err);
-        res.send("Something went wrong.");
+        res.send("Something went wrong during registration.");
     }
 });
 
@@ -186,18 +191,17 @@ router.get('/verify/:token', async (req, res) => {
 
         return res.render('message', {
             title: "Registration Successful",
-            message: `Please check your email to verify your account.`,
-            type: "success", // optional: can be 'success', 'error', 'info'
-            redirectUrl: "/users/login", // optional button to go to login
+            message: `Your account has been verified successfully!`,
+            type: "success",
+            redirectUrl: "/users/login",
             buttonText: "Go to Login"
         });
 
     } catch (err) {
         console.error("Verification error:", err);
-        res.send("Something went wrong.");
+        res.send("Something went wrong during verification.");
     }
 });
-
 
 /* -------------------------------------------
    SHOW ALL USERS
