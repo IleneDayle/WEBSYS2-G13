@@ -44,6 +44,24 @@ router.post('/book', async (req, res) => {
         const notes = req.body.notes || '';
         const price = Number(req.body.price) || 0;
 
+        // Validate pickup date: must be present or future, not past
+        if (pickupDate) {
+            const selectedDate = new Date(pickupDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of day
+            selectedDate.setHours(0, 0, 0, 0); // Reset time to start of day
+
+            if (selectedDate < today) {
+                return res.render('message', {
+                    title: 'Invalid Date',
+                    message: 'Pickup date cannot be in the past. Please select today or a future date.',
+                    type: 'error',
+                    redirectUrl: '/services/book',
+                    buttonText: 'Back to Booking'
+                });
+            }
+        }
+
         const order = {
             userEmail: req.session.user.email,
             userId: req.session.user.userId,
@@ -68,10 +86,15 @@ router.post('/book', async (req, res) => {
         });
 
     } catch (err) {
-        console.error('Booking error:', err);
+        console.error('Booking error:', err && (err.stack || err));
+        console.error('Error details:', {
+            message: err && err.message,
+            code: err && err.code,
+            details: err && err.errmsg
+        });
         return res.render('message', {
             title: 'Booking Failed',
-            message: 'Could not create booking. Please try again.',
+            message: 'Could not create booking. Error: ' + (err && err.message ? err.message : 'Unknown error'),
             type: 'error',
             redirectUrl: '/users/dashboard',
             buttonText: 'Back to Dashboard'

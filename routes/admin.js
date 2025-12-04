@@ -60,6 +60,74 @@ router.get('/services', async (req, res) => {
     res.render('admin-services', { title: 'Manage Services', services, currentUser: req.session.user });
 });
 
+router.get('/reports', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    try {
+        const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
+        
+        // Get all orders with user info
+        const orders = await db.collection('orders').find().sort({ createdAt: -1 }).toArray();
+        const users = await db.collection('users').find().toArray();
+        
+        // Calculate sales metrics
+        let totalRevenue = 0;
+        let totalOrders = 0;
+        let completedOrders = 0;
+        let pendingOrders = 0;
+        let cancelledOrders = 0;
+        const salesByService = {};
+        const salesByUser = {};
+        
+        orders.forEach(order => {
+            totalOrders++;
+            const amount = Number(order.price) || 0;
+            totalRevenue += amount;
+            
+            // Count by status
+            if (order.status === 'completed') completedOrders++;
+            if (order.status === 'pending') pendingOrders++;
+            if (order.status === 'cancelled') cancelledOrders++;
+            
+            // Sales by service
+            const service = order.serviceName || 'Unknown';
+            if (!salesByService[service]) {
+                salesByService[service] = { count: 0, revenue: 0 };
+            }
+            salesByService[service].count++;
+            salesByService[service].revenue += amount;
+            
+            // Sales by user
+            const userEmail = order.userEmail || 'Unknown';
+            if (!salesByUser[userEmail]) {
+                salesByUser[userEmail] = { count: 0, revenue: 0, userName: '' };
+                const user = users.find(u => u.email === userEmail);
+                if (user) {
+                    salesByUser[userEmail].userName = `${user.firstName} ${user.lastName}`;
+                }
+            }
+            salesByUser[userEmail].count++;
+            salesByUser[userEmail].revenue += amount;
+        });
+        
+        const reportsData = {
+            totalRevenue,
+            totalOrders,
+            completedOrders,
+            pendingOrders,
+            cancelledOrders,
+            avgOrderValue: totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0,
+            salesByService,
+            salesByUser
+        };
+        
+        res.render('admin-reports', { title: 'Sales Reports', reportsData, currentUser: req.session.user });
+    } catch (err) {
+        console.error('Admin reports error:', err);
+        res.render('message', { title: 'Error', message: 'Could not load reports.', type: 'error', redirectUrl: '/users/admin', buttonText: 'Back' });
+    }
+});
+
 /* -------------------------------------------
    ADMIN ACTIONS: Orders / Payments / Support / Services
 ------------------------------------------- */

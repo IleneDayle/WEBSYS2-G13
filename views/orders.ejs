@@ -15,33 +15,73 @@
         </nav>
 
         <div class="main-content">
-            <h1>My Orders</h1>
-            <div style="max-width:900px; margin:20px auto;">
+            <h1 style="text-align: center; margin-bottom: 30px;">My Orders</h1>
+            <div style="max-width:1000px; margin:20px auto; padding: 0 20px;">
                 <% if (!orders || orders.length === 0) { %>
-                    <div class="message info">You have no orders yet. <a href="/services/book">Book a service</a>.</div>
+                    <div class="message info" style="text-align: center; padding: 40px;">
+                        You have no orders yet. <a href="/services/book" style="color: #667eea; font-weight: 600;">Book a service</a> to get started.
+                    </div>
                 <% } else { %>
-                    <table>
-                        <thead>
-                            <tr><th>Order ID</th><th>Service</th><th>Pickup</th><th>Price</th><th>Status</th><th>Payment</th><th>Actions</th></tr>
-                        </thead>
-                        <tbody>
-                        <% orders.forEach(function(o){ %>
-                            <tr>
-                                <td><a href="/orders/<%= o._id %>"><%= o._id %></a></td>
-                                <td><%= o.serviceName %></td>
-                                <td><%= o.pickupDate ? new Date(o.pickupDate).toLocaleDateString() : '-' %></td>
-                                <td>₱<%= o.price %></td>
-                                <td><%= o.status %></td>
-                                <td><%= o.paymentStatus %></td>
-                                <td>
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <% orders.forEach(function(o, index){ %>
+                            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+                                    
+                                    <div style="flex: 1; min-width: 200px;">
+                                        <p style="font-size: 0.75em; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Service</p>
+                                        <a href="/orders/<%= o._id %>" style="color: #667eea; text-decoration: none; font-weight: 600; font-size: 1em;"><%= o.serviceName || 'Service' %></a>
+                                    </div>
+
+                                    <div style="flex: 1; min-width: 150px;">
+                                        <p style="font-size: 0.75em; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Pickup</p>
+                                        <p style="margin: 0; color: #2d3748; font-weight: 500;">
+                                            <%= o.pickupDate ? new Date(o.pickupDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'TBD' %>
+                                        </p>
+                                    </div>
+
+                                    <div style="flex: 0 0 auto;">
+                                        <p style="font-size: 0.75em; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Price</p>
+                                        <p style="margin: 0; color: #2d3748; font-weight: 700; font-size: 1.1em;">₱<%= o.price || '0' %></p>
+                                    </div>
+
+                                    <div style="flex: 0 0 auto;">
+                                        <p style="font-size: 0.75em; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Status</p>
+                                        <% 
+                                            var statusBg = '#fef3c7';
+                                            var statusText = '#92400e';
+                                            if (o.status === 'completed') {
+                                                statusBg = '#d1fae5';
+                                                statusText = '#065f46';
+                                            } else if (o.status === 'cancelled') {
+                                                statusBg = '#fee2e2';
+                                                statusText = '#991b1b';
+                                            } else if (o.status === 'shipped') {
+                                                statusBg = '#dbeafe';
+                                                statusText = '#0c4a6e';
+                                            }
+                                        %>
+                                        <span style="background-color: <%= statusBg %>; color: <%= statusText %>; padding: 6px 10px; border-radius: 5px; font-size: 0.8em; font-weight: 700; display: inline-block; text-transform: capitalize;">
+                                            <%= o.status || 'pending' %>
+                                        </span>
+                                    </div>
+
+                                    <div style="flex: 0 0 auto;">
+                                        <p style="font-size: 0.75em; color: #94a3b8; margin: 0 0 6px 0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Payment</p>
+                                        <span style="background-color: <%= o.paymentStatus === 'paid' ? '#d1fae5' : '#fef3c7' %>; color: <%= o.paymentStatus === 'paid' ? '#065f46' : '#92400e' %>; padding: 6px 10px; border-radius: 5px; font-size: 0.8em; font-weight: 700; display: inline-block; text-transform: capitalize;">
+                                            <%= o.paymentStatus || 'unpaid' %>
+                                        </span>
+                                    </div>
+
                                     <% if (o.status !== 'cancelled' && o.status !== 'completed') { %>
-                                        <form method="POST" action="/orders/cancel/<%= o._id %>" style="display:inline;"><button type="submit">Cancel</button></form>
+                                        <button onclick="document.getElementById('cancelForm<%= index %>').submit();" style="background-color: #fee2e2; color: #991b1b; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 0.8em; flex: 0 0 auto;">Cancel</button>
+                                        <form id="cancelForm<%= index %>" method="POST" action="/orders/cancel/<%= o._id %>" style="display: none;"></form>
                                     <% } %>
-                                </td>
-                            </tr>
+                                    <a href="/orders/<%= o._id %>" style="background-color: #667eea; color: white; padding: 6px 12px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 0.8em; display: inline-block; margin-left: 8px; flex: 0 0 auto;">Details</a>
+
+                                </div>
+                            </div>
                         <% }); %>
-                        </tbody>
-                    </table>
+                    </div>
                 <% } %>
             </div>
         </div>

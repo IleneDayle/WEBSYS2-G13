@@ -352,7 +352,18 @@ router.post('/login', async (req, res) => {
 router.get('/dashboard', (req, res) => {
     if (!req.session.user)
         return res.redirect('/users/login?message=' + encodeURIComponent("Session expired. Please log in again."));
-    res.render('dashboard', { title: "User Dashboard", user: req.session.user });
+    
+    // For customer dashboard, render simple welcome page
+    // Users can view their actual orders on the /orders/my page
+    res.render('dashboard', { 
+        title: "User Dashboard", 
+        user: req.session.user,
+        stats: {
+            totalOrders: 0,
+            activeOrders: 0,
+            totalSpent: 0
+        }
+    });
 });
 
 /* -------------------------------------------
