@@ -2,18 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= title %></title>
-  <link rel="stylesheet" href="/css/style.css"><!-- your CSS -->
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <div class="message-container">
-    <div class="message-box <%= type %>">
-      <h1><%= title %></h1>
-      <p><%= message %></p>
-      <% if (redirectUrl) { %>
-        <a href="<%= redirectUrl %>" class="btn"><%= buttonText %></a>
-      <% } %>
+  <nav class="navbar">
+    <span class="brand">
+      <a href="/">SpinCycle Laundry</a>
+    </span>
+    <div class="auth">
+      <a href="/">Home</a>
+      <a href="/users/register">Register</a>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="message-container">
+      <div class="message-box <%= type %>">
+        <h1><%= title %></h1>
+        <p><%= message %></p>
+        <% if (redirectUrl) { %>
+          <a href="<%= redirectUrl %>" class="btn"><%= buttonText || 'Continue' %></a>
+        <% } %>
+      </div>
     </div>
   </div>
+
+  <footer>
+    <p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p>
+  </footer>
+
 </body>
 </html>

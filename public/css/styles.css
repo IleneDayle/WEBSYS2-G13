@@ -143,14 +143,6 @@ form::before {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2d3748;
-    font-size: 0.95em;
-}
-
 input[type="text"],
 input[type="email"],
 input[type="password"] {
@@ -166,64 +158,39 @@ input[type="password"] {
     font-family: inherit;
 }
 
-/* Input with inline toggle (eye) */
+/* Input with adjacent toggle */
 .input-with-toggle {
-    position: relative;
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
     width: 100%;
 }
-
 .input-with-toggle input[type="password"],
 .input-with-toggle input[type="text"] {
-    padding-right: 44px; /* space for the toggle button */
+    flex: 1 1 auto;
+    padding-right: 12px;
 }
 
-.toggle-btn {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
+/* Checkbox label used as toggle */
+.toggle-checkbox-label {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0;
-    z-index: 2;
-    color: #667eea;
+    gap: 8px;
+    margin-left: 8px;
+    color: rgba(102,126,234,0.85);
+    font-weight: 600;
+    font-size: 0.9em;
+    cursor: pointer;
+}
+.toggle-checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #667eea;
 }
 
-.toggle-btn:hover {
-    background: transparent; /* keep it subtle */
-}
-
-.toggle-btn:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.08);
-}
-
-.toggle-icon {
-    pointer-events: none;
-    user-select: none;
-    display: inline-block;
-}
-
-/* Ensure SVG icons inherit color */
-.toggle-icon svg { display: block; color: inherit; stroke: currentColor; width:16px; height:16px; }
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="password"]:focus {
-    outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
-}
+/* Hide legacy toggle button if present */
+.toggle-btn { display: none; }
 
 /* Button styles */
 button {
@@ -443,20 +410,6 @@ tbody tr:last-child td {
     font-size: 0.9em;
     transition: all 0.3s ease;
     position: relative;
-    padding-left: 24px;
-}
-
-#password-criteria li::before {
-    content: '✕';
-    position: absolute;
-    left: 0;
-    color: #e53e3e;
-    font-weight: bold;
-}
-
-#password-criteria li[style*="green"]::before {
-    content: '✓';
-    color: #38a169;
 }
 
 /* Example styles to match your existing design */
@@ -584,5 +537,16 @@ footer {
     
     form {
         padding: 20px 15px;
+    }
+
+    /* On very small screens, stack the toggle under the input to avoid cramped layout */
+    .input-with-toggle {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .toggle-checkbox-label {
+        margin-left: 0;
+        margin-top: 6px;
+        align-self: flex-end;
     }
 }

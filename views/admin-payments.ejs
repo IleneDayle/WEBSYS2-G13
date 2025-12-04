@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/users/admin">Admin</a></span>
+            <div class="auth"><a href="/users/logout">Logout</a></div>
+        </nav>
+        <div class="main-content">
+            <h1>Payments</h1>
+            <div style="max-width:900px; margin:20px auto;">
+                <% if (!payments || payments.length === 0) { %>
+                    <div class="message info">No payments recorded.</div>
+                <% } else { %>
+                    <table>
+                        <thead><tr><th>Date</th><th>User</th><th>Order</th><th>Amount</th><th>Method</th></tr></thead>
+                        <tbody>
+                            <% payments.forEach(p => { %>
+                                <tr>
+                                    <td><%= new Date(p.createdAt).toLocaleString() %></td>
+                                    <td><%= p.userEmail %></td>
+                                    <td><a href="/orders/<%= p.orderId %>"><%= p.orderId %></a></td>
+                                    <td>₱<%= p.amount %></td>
+                                    <td><%= p.method %></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+        <footer><p>&copy; 2025 SpinCycle Laundry.</p></footer>
+    </body>
+</html>

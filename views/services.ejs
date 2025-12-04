@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/">SpinCycle Laundry</a></span>
+            <div class="auth">
+                <a href="/users/dashboard">Dashboard</a>
+                <a href="/users/logout">Logout</a>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <h1>Book a Service</h1>
+
+            <div style="max-width: 720px; margin: 20px auto;">
+                <% services.forEach(function(svc){ %>
+                    <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 12px; border:1px solid #e2e8f0;">
+                        <h3 style="margin-bottom:8px;"><%= svc.name %> — ₱<%= svc.price %></h3>
+                        <p style="color:#64748b; margin-bottom:12px;">Fast, reliable laundry service.</p>
+                        <form method="POST" action="/services/book" style="display:flex; flex-direction:column; gap:8px;">
+                            <input type="hidden" name="serviceId" value="<%= svc.id %>">
+                            <input type="hidden" name="serviceName" value="<%= svc.name %>">
+                            <input type="hidden" name="price" value="<%= svc.price %>">
+                            <div style="display:flex; gap:8px;">
+                                <input type="date" name="pickupDate" id="pickupDate-<%= svc.id %>" required style="padding:10px; border-radius:8px; border:1px solid #e2e8f0; flex:1;">
+                                <input type="text" name="notes" placeholder="Notes (optional)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                            </div>
+                            <button type="submit" style="width:100%;">Book — ₱<%= svc.price %></button>
+                        </form>
+                        <script>
+                            (function(){
+                                const dateInput = document.getElementById('pickupDate-<%= svc.id %>');
+                                if (dateInput) {
+                                    // Set minimum date to today
+                                    const today = new Date();
+                                    const yyyy = today.getFullYear();
+                                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                                    const dd = String(today.getDate()).padStart(2, '0');
+                                    dateInput.min = `${yyyy}-${mm}-${dd}`;
+                                }
+                            })();
+                        </script>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 SpinCycle Laundry.</p>
+        </footer>
+    </body>
+</html>

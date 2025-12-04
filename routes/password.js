@@ -19,7 +19,13 @@ router.post('/forgot', async (req, res) => {
     // Find user by email
     const user = await usersCollection.findOne({ email: req.body.email });
     if (!user) {
-        return res.send("No account found with this email.");
+        return res.render('message', {
+            title: "No Account Found",
+            message: "No account found with this email.",
+            type: "error",
+            redirectUrl: "/password/forgot",
+            buttonText: "Try Again"
+        });
     }
 
     // Generate reset token and expiry (1 hour)
@@ -48,10 +54,22 @@ router.post('/forgot', async (req, res) => {
         `
     });
 
-    res.send("If an account with that email exists, a reset link has been sent.");
+    res.render('message', {
+        title: "Reset Email Sent",
+        message: "If an account with that email exists, a reset link has been sent.",
+        type: "success",
+        redirectUrl: "/users/login",
+        buttonText: "Return to Login"
+    });
     } catch (err) {
         console.error("Error in password reset:", err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -76,12 +94,24 @@ router.post('/reset/:token', async (req, res) => {
     });
     
     if (!user) {
-        return res.send("Reset link is invalid or has expired.");
+        return res.render('message', {
+            title: "Invalid or Expired Link",
+            message: "Reset link is invalid or has expired.",
+            type: "error",
+            redirectUrl: "/password/forgot",
+            buttonText: "Request Reset"
+        });
     }
     
     // Check if passwords match
     if (req.body.password !== req.body.confirm) {
-        return res.send("Passwords do not match.");
+        return res.render('message', {
+            title: "Password Mismatch",
+            message: "Passwords do not match.",
+            type: "error",
+            redirectUrl: `/password/reset/${req.params.token}`,
+            buttonText: "Try Again"
+        });
     }
 
     // Hash the new password
@@ -96,10 +126,22 @@ router.post('/reset/:token', async (req, res) => {
         }
         );
 
-        res.send("Password has been reset. You can now log in with your new password.");
+        res.render('message', {
+            title: "Password Reset Successful",
+            message: "Password has been reset. You can now log in with your new password.",
+            type: "success",
+            redirectUrl: "/users/login",
+            buttonText: "Login"
+        });
     } catch (err) {
         console.error("Error resetting password:", err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 

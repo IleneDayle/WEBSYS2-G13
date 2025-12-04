@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/">SpinCycle Laundry</a></span>
+            <div class="auth">
+                <a href="/users/dashboard">Dashboard</a>
+                <a href="/users/logout">Logout</a>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <h1>Contact Support</h1>
+            <div style="max-width:800px; margin:20px auto;">
+                <form method="POST" action="/support/ticket" style="background:white; padding:16px; border-radius:12px; border:1px solid #e2e8f0;">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" required>
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" rows="6" style="width:100%; padding:10px; border-radius:8px; border:1px solid #e2e8f0;"></textarea>
+                    <button type="submit">Submit Ticket</button>
+                </form>
+
+                <h3 style="margin-top:20px;">Your Tickets</h3>
+                <% if (!tickets || tickets.length === 0) { %>
+                    <div class="message info">No support tickets yet.</div>
+                <% } else { %>
+                    <div style="display:grid; gap:10px;">
+                        <% tickets.forEach(function(t){ %>
+                            <div style="background:white; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+                                <strong><%= t.subject %></strong>
+                                <p style="margin:8px 0; color:#64748b;"><%= t.message %></p>
+                                <small>Status: <%= t.status %> • <%= new Date(t.createdAt).toLocaleString() %></small>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 SpinCycle Laundry.</p>
+        </footer>
+    </body>
+</html>

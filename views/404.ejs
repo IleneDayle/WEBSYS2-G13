@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title || 'Page Not Found' %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <nav class="navbar">
+      <span class="brand"><a href="/">SpinCycle Laundry</a></span>
+      <div class="auth">
+        <a href="/">Home</a>
+        <a href="/users/login">Login</a>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="message-container">
+        <div class="message-box error">
+          <h1>404 — Page Not Found</h1>
+          <p style="margin-top:12px; color:#64748b;"><%= message || 'The page you requested could not be found.' %></p>
+          <a class="btn" href="/">Return Home</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p>
+    </footer>
+  </body>
+</html>

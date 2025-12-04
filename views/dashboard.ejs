@@ -216,12 +216,6 @@
                         <p class="status-badge status-active">Active</p>
                     </div>
                     <div class="info-card">
-                        <h3>Email Verification</h3>
-                        <p class="status-badge <%= user.isEmailVerified ? 'status-verified' : 'status-unverified' %>">
-                            <%= user.isEmailVerified ? "Verified" : "Unverified" %>
-                        </p>
-                    </div>
-                    <div class="info-card">
                         <h3>Member Since</h3>
                         <p>January 2025</p>
                     </div>
@@ -230,11 +224,11 @@
                 <!-- Quick Actions -->
                 <h2>Quick Actions</h2>
                 <div class="quick-actions">
-                    <a href="#" class="action-button" onclick="bookService()">Book New Service</a>
-                    <a href="#" class="action-button" onclick="viewOrders()">View My Orders</a>
-                    <a href="#" class="action-button" onclick="editProfile()">Edit Profile</a>
-                    <a href="#" class="action-button" onclick="viewBilling()">Billing & Payments</a>
-                    <a href="#" class="action-button" onclick="contactSupport()">Contact Support</a>
+                    <a href="/services/book" class="action-button">Book New Service</a>
+                    <a href="/orders/my" class="action-button">View My Orders</a>
+                    <a href="/users/profile/edit" class="action-button">Edit Profile</a>
+                    <a href="/billing" class="action-button">Billing & Payments</a>
+                    <a href="/support" class="action-button">Contact Support</a>
                     <% if (user.role === 'admin') { %>
                         <a href="/users/admin" class="action-button">Admin Dashboard</a>
                     <% } %>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/users/admin">Admin</a></span>
+            <div class="auth"><a href="/users/logout">Logout</a></div>
+        </nav>
+        <div class="main-content">
+            <h1>Manage Services</h1>
+            <div style="max-width:800px; margin:20px auto;">
+                <% services.forEach(s => { %>
+                    <div style="background:white; padding:12px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                        <form method="POST" action="/admin/services/update/<%= s.id %>" style="display:flex; gap:8px; align-items:center;">
+                            <div>
+                                <input type="text" name="name" value="<%= s.name %>" style="padding:6px; border:1px solid #e2e8f0; border-radius:6px;">
+                                <input type="number" name="price" value="<%= s.price %>" style="padding:6px; width:100px; border:1px solid #e2e8f0; border-radius:6px; margin-left:8px;">
+                            </div>
+                            <div>
+                                <button type="submit" style="margin-right:8px;">Save</button>
+                        </form>
+
+                        <form method="POST" action="/admin/services/delete/<%= s.id %>" style="display:inline;">
+                            <button type="submit" style="background:#f56565; color:white;">Delete</button>
+                        </form>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+        <footer><p>&copy; 2025 SpinCycle Laundry.</p></footer>
+    </body>
+</html>

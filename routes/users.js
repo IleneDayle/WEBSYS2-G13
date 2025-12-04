@@ -41,7 +41,13 @@ router.post('/register', async (req, res) => {
 
         // Check duplicate email
         const existingUser = await usersCollection.findOne({ email: req.body.email });
-        if (existingUser) return res.send("User already exists with this email.");
+        if (existingUser) return res.render('message', {
+            title: "User Exists",
+            message: "User already exists with this email.",
+            type: "error",
+            redirectUrl: "/users/register",
+            buttonText: "Register"
+        });
 
         // Hash password
         const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
@@ -83,15 +89,33 @@ router.post('/register', async (req, res) => {
                 `
             });
 
-            return res.send("Registration successful! Please check your email to verify your account.");
+            return res.render('message', {
+                title: "Registration Successful",
+                message: "Registration successful! Please check your email to verify your account.",
+                type: "success",
+                redirectUrl: "/users/login",
+                buttonText: "Go to Login"
+            });
         } catch (emailErr) {
             console.error("Failed to send verification email:", emailErr);
-            return res.send("Registration successful, but failed to send verification email. Please contact support.");
+            return res.render('message', {
+                title: "Registration Created",
+                message: "Registration successful, but failed to send verification email. Please contact support.",
+                type: "info",
+                redirectUrl: "/",
+                buttonText: "Home"
+            });
         }
 
     } catch (err) {
         console.error("Error during registration:", err);
-        res.send("Something went wrong during registration.");
+        res.render('message', {
+            title: "Registration Error",
+            message: "Something went wrong during registration.",
+            type: "error",
+            redirectUrl: "/users/register",
+            buttonText: "Try Again"
+        });
     }
 });
 
@@ -107,80 +131,24 @@ router.get('/verify/:token', async (req, res) => {
 
         //  INVALID TOKEN UI
         if (!user) {
-            return res.send(`
-                <div style="
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    background: #f5f5f5;
-                ">
-                    <div style="
-                        background: white;
-                        padding: 40px;
-                        max-width: 420px;
-                        width: 100%;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                        text-align: center;
-                    ">
-                        <h1 style="color: #e74c3c; margin-bottom: 10px;">✖ Invalid Link</h1>
-                        <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-                            This verification link is invalid or has already been used.
-                        </p>
-
-                        <a href="/users/register" style="
-                            display: inline-block;
-                            padding: 12px 25px;
-                            background-color: #3498db;
-                            color: white;
-                            text-decoration: none;
-                            border-radius: 6px;
-                            font-size: 16px;
-                        ">Register Again</a>
-                    </div>
-                </div>
-            `);
+            return res.render('message', {
+                title: "Invalid Link",
+                message: "This verification link is invalid or has already been used.",
+                type: "error",
+                redirectUrl: "/users/register",
+                buttonText: "Register"
+            });
         }
 
         // EXPIRED TOKEN UI
         if (user.tokenExpiry < new Date()) {
-            return res.send(`
-                <div style="
-                    font-family: Arial, sans-serif;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    height: 100vh;
-                    background: #f5f5f5;
-                ">
-                    <div style="
-                        background: white;
-                        padding: 40px;
-                        max-width: 420px;
-                        width: 100%;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                        text-align: center;
-                    ">
-                        <h1 style="color: #f39c12; margin-bottom: 10px;">⚠ Link Expired</h1>
-                        <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
-                            Your verification link has expired. Please register again to receive a new one.
-                        </p>
-
-                        <a href="/users/register" style="
-                            display: inline-block;
-                            padding: 12px 25px;
-                            background-color: #3498db;
-                            color: white;
-                            text-decoration: none;
-                            border-radius: 6px;
-                            font-size: 16px;
-                        ">Register Again</a>
-                    </div>
-                </div>
-            `);
+            return res.render('message', {
+                title: "Link Expired",
+                message: "Your verification link has expired. Please register again to receive a new one.",
+                type: "error",
+                redirectUrl: "/users/register",
+                buttonText: "Register"
+            });
         }
 
         // ✔ SUCCESS – VERIFIED
@@ -199,7 +167,13 @@ router.get('/verify/:token', async (req, res) => {
 
     } catch (err) {
         console.error("Verification error:", err);
-        res.send("Something went wrong during verification.");
+        res.render('message', {
+            title: "Verification Error",
+            message: "Something went wrong during verification.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -214,7 +188,13 @@ router.get('/list', async (req, res) => {
         res.render('users-list', { title: "Registered Users", users });
     } catch (err) {
         console.error(err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -226,12 +206,24 @@ router.get('/edit/:id', async (req, res) => {
         const db = await getDB();
         const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
 
-        if (!user) return res.send("User not found.");
+        if (!user) return res.render('message', {
+            title: "User Not Found",
+            message: "User not found.",
+            type: "error",
+            redirectUrl: "/users/list",
+            buttonText: "Back"
+        });
 
         res.render('edit-user', { title: "Edit User", user });
     } catch (err) {
         console.error(err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -256,7 +248,13 @@ router.post('/edit/:id', async (req, res) => {
         res.redirect('/users/list');
     } catch (err) {
         console.error(err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -270,7 +268,13 @@ router.post('/delete/:id', async (req, res) => {
         res.redirect('/users/list');
     } catch (err) {
         console.error(err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 });
 
@@ -287,14 +291,38 @@ router.post('/login', async (req, res) => {
         const usersCollection = db.collection('users');
 
         const user = await usersCollection.findOne({ email: req.body.email });
-        if (!user) return res.send("User not found.");
+        if (!user) return res.render('message', {
+            title: "Login Failed",
+            message: "User not found.",
+            type: "error",
+            redirectUrl: "/users/login",
+            buttonText: "Back to Login"
+        });
 
-        if (user.accountStatus !== "active") return res.send("Account is not active.");
-        if (!user.isEmailVerified) return res.send("Please verify your email first.");
+        if (user.accountStatus !== "active") return res.render('message', {
+            title: "Account Inactive",
+            message: "Account is not active.",
+            type: "error",
+            redirectUrl: "/users/login",
+            buttonText: "Back to Login"
+        });
+        if (!user.isEmailVerified) return res.render('message', {
+            title: "Email Not Verified",
+            message: "Please verify your email first.",
+            type: "error",
+            redirectUrl: "/users/login",
+            buttonText: "Back to Login"
+        });
 
         const valid = await bcrypt.compare(req.body.password, user.passwordHash);
 
-        if (!valid) return res.send("Invalid password.");
+        if (!valid) return res.render('message', {
+            title: "Login Failed",
+            message: "Invalid password.",
+            type: "error",
+            redirectUrl: "/users/login",
+            buttonText: "Back to Login"
+        });
 
         req.session.user = {
             userId: user.userId,
@@ -308,7 +336,13 @@ router.post('/login', async (req, res) => {
 
     } catch (err) {
         console.error("Login error:", err);
-        res.send("Something went wrong.");
+        res.render('message', {
+            title: "Login Error",
+            message: "Something went wrong.",
+            type: "error",
+            redirectUrl: "/users/login",
+            buttonText: "Back to Login"
+        });
     }
 });
 
@@ -319,6 +353,48 @@ router.get('/dashboard', (req, res) => {
     if (!req.session.user)
         return res.redirect('/users/login?message=' + encodeURIComponent("Session expired. Please log in again."));
     res.render('dashboard', { title: "User Dashboard", user: req.session.user });
+});
+
+/* -------------------------------------------
+   PROFILE EDIT (self)
+------------------------------------------- */
+router.get('/profile/edit', async (req, res) => {
+    if (!req.session.user) return res.redirect('/users/login?message=' + encodeURIComponent('Please log in to edit your profile.'));
+
+    try {
+        const db = await getDB();
+        const user = await db.collection('users').findOne({ email: req.session.user.email });
+        if (!user) return res.render('message', { title: 'User Not Found', message: 'User not found.', type: 'error', redirectUrl: '/users/dashboard', buttonText: 'Back' });
+
+        res.render('profile-edit', { title: 'Edit Profile', user });
+    } catch (err) {
+        console.error('Profile load error:', err);
+        res.render('message', { title: 'Error', message: 'Could not load profile.', type: 'error', redirectUrl: '/users/dashboard', buttonText: 'Back' });
+    }
+});
+
+router.post('/profile/edit', async (req, res) => {
+    if (!req.session.user) return res.redirect('/users/login?message=' + encodeURIComponent('Please log in to edit your profile.'));
+
+    try {
+        const db = await getDB();
+        await db.collection('users').updateOne({ email: req.session.user.email }, { $set: {
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            updatedAt: new Date()
+        }});
+
+        // Update session info
+        req.session.user.firstName = req.body.firstName;
+        req.session.user.lastName = req.body.lastName;
+        req.session.user.email = req.body.email;
+
+        res.render('message', { title: 'Profile Updated', message: 'Your profile has been updated.', type: 'success', redirectUrl: '/users/dashboard', buttonText: 'Back to Dashboard' });
+    } catch (err) {
+        console.error('Profile save error:', err);
+        res.render('message', { title: 'Error', message: 'Could not save profile.', type: 'error', redirectUrl: '/users/dashboard', buttonText: 'Back' });
+    }
 });
 
 /* -------------------------------------------
@@ -335,7 +411,13 @@ router.get('/logout', (req, res) => {
 ------------------------------------------- */
 router.get('/admin', async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'admin') {
-        return res.status(403).send("Access denied.");
+        return res.status(403).render('message', {
+            title: "Access Denied",
+            message: "Access denied.",
+            type: "error",
+            redirectUrl: "/",
+            buttonText: "Home"
+        });
     }
 
     const db = await getDB();

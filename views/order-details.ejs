@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/">SpinCycle Laundry</a></span>
+            <div class="auth">
+                <a href="/users/dashboard">Dashboard</a>
+                <a href="/users/logout">Logout</a>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <h1>Order Details</h1>
+            <div style="max-width:700px; margin:20px auto; background:white; padding:20px; border-radius:12px; border:1px solid #e2e8f0;">
+                <p><strong>Order ID:</strong> <%= order._id %></p>
+                <p><strong>Service:</strong> <%= order.serviceName %></p>
+                <p><strong>Pickup Date:</strong> <%= order.pickupDate ? new Date(order.pickupDate).toLocaleString() : '-' %></p>
+                <p><strong>Notes:</strong> <%= order.notes || '-' %></p>
+                <p><strong>Price:</strong> ₱<%= order.price %></p>
+                <p><strong>Status:</strong> <%= order.status %></p>
+                <p><strong>Payment:</strong> <%= order.paymentStatus %></p>
+                <div style="margin-top:16px;">
+                    <% if (order.paymentStatus !== 'paid') { %>
+                        <form method="POST" action="/billing/pay/<%= order._id %>">
+                            <input type="hidden" name="method" value="card">
+                            <button type="submit">Pay ₱<%= order.price %></button>
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 SpinCycle Laundry.</p>
+        </footer>
+    </body>
+</html>

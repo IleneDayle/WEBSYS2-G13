@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/">SpinCycle Laundry</a></span>
+            <div class="auth">
+                <a href="/users/dashboard">Dashboard</a>
+                <a href="/users/logout">Logout</a>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <h1>My Orders</h1>
+            <div style="max-width:900px; margin:20px auto;">
+                <% if (!orders || orders.length === 0) { %>
+                    <div class="message info">You have no orders yet. <a href="/services/book">Book a service</a>.</div>
+                <% } else { %>
+                    <table>
+                        <thead>
+                            <tr><th>Order ID</th><th>Service</th><th>Pickup</th><th>Price</th><th>Status</th><th>Payment</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                        <% orders.forEach(function(o){ %>
+                            <tr>
+                                <td><a href="/orders/<%= o._id %>"><%= o._id %></a></td>
+                                <td><%= o.serviceName %></td>
+                                <td><%= o.pickupDate ? new Date(o.pickupDate).toLocaleDateString() : '-' %></td>
+                                <td>₱<%= o.price %></td>
+                                <td><%= o.status %></td>
+                                <td><%= o.paymentStatus %></td>
+                                <td>
+                                    <% if (o.status !== 'cancelled' && o.status !== 'completed') { %>
+                                        <form method="POST" action="/orders/cancel/<%= o._id %>" style="display:inline;"><button type="submit">Cancel</button></form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 SpinCycle Laundry.</p>
+        </footer>
+    </body>
+</html>
