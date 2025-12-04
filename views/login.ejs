@@ -32,7 +32,12 @@
                 <input type="email" id="email" name="email" required placeholder="Enter your email">
                 
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                <div class="input-with-toggle">
+                    <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    <button type="button" class="toggle-btn" id="togglePassword" aria-label="Show password">
+                        <span class="toggle-icon"></span>
+                    </button>
+                </div>
                 
                 <button type="submit">Sign In</button>
 
@@ -46,5 +51,28 @@
         <footer>
             <p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p>
         </footer>
+
+        <script>
+            // Styled eye toggle for login password
+            (function(){
+                const pwd = document.getElementById('password');
+                const btn = document.getElementById('togglePassword');
+                const icon = btn && btn.querySelector('.toggle-icon');
+                if (!btn || !pwd || !icon) return;
+
+                const ICON_SHOW = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+                const ICON_HIDE = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.25 21.25 0 0 1 5.06-6.94"/><path d="M1 1l22 22"/></svg>';
+
+                // initialize icon
+                icon.innerHTML = ICON_SHOW;
+
+                btn.addEventListener('click', function(){
+                    const isText = pwd.type === 'text';
+                    pwd.type = isText ? 'password' : 'text';
+                    btn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+                    icon.innerHTML = isText ? ICON_SHOW : ICON_HIDE;
+                });
+            })();
+        </script>
     </body>
 </html>

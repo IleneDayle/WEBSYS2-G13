@@ -1,266 +1,342 @@
 // routes/users.js
-const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY); // fetches the API KEY from the .env file
 const express = require('express');
 const router = express.Router();
+const { Resend } = require('resend');
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const saltRounds = 12;
-const { MongoClient } = require('mongodb');
 const { ObjectId } = require('mongodb');
 require('dotenv').config();
 
-// Base URL: local (http://localhost:3000) or deployed (https://yourapp.onrender.com)
 const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
 
-// MongoDB setup
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+// MongoDB Client (use only one)
+const client = new (require('mongodb').MongoClient)(process.env.MONGO_URI);
 const dbName = "ecommerceDB";
 
-// Show registration form
+// Ensure MongoDB connection on server start
+async function getDB() {
+    if (!client.topology || !client.topology.isConnected()) {
+        await client.connect();
+    }
+    return client.db(dbName);
+}
+
+/* -------------------------------------------
+   SHOW REGISTER FORM
+------------------------------------------- */
 router.get('/register', (req, res) => {
     res.render('register', { title: "Register" });
 });
 
-// Registration (POST)
+/* -------------------------------------------
+   REGISTRATION
+------------------------------------------- */
 router.post('/register', async (req, res) => {
     try {
-        const db = req.app.locals.client.db(req.app.locals.dbName);
+        const db = await getDB();
         const usersCollection = db.collection('users');
-        
-        // 1. Check if user already exists by email
+
+        // Check duplicate email
         const existingUser = await usersCollection.findOne({ email: req.body.email });
         if (existingUser) return res.send("User already exists with this email.");
 
-        // 2. Hash password
+        // Hash password
         const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-        const currentDate = new Date();
-        
-        // 3. Create verification token
+
+        // Verification token
         const token = uuidv4();
-        
-        // 4. Build new user object
+
+        // Create user object
         const newUser = {
-            userId: uuidv4(), // unique ID for the user
-            firstName: req.body.firstName, // from form input
+            userId: uuidv4(),
+            firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
-            passwordHash: hashedPassword, // never store plain text password
-            role: 'customer', // default role
-            accountStatus: 'active',
-            isEmailVerified: false, // must be verified before login
-            verificationToken: token, // link user to verification
-            tokenExpiry: new Date(Date.now() + 3600000), // expires in 1 hour
-            createdAt: currentDate,
-            updatedAt: currentDate
+            passwordHash: hashedPassword,
+            role: "customer",
+            accountStatus: "active",
+            isEmailVerified: false,
+            verificationToken: token,
+            tokenExpiry: new Date(Date.now() + 3600 * 1000),
+            createdAt: new Date(),
+            updatedAt: new Date()
         };
 
-        // 5. Insert into database
         await usersCollection.insertOne(newUser);
 
-        // Send verification email using Resend
+        // Build verification URL
         const verificationUrl = `${baseUrl}/users/verify/${token}`;
+
+        // Send email
         await resend.emails.send({
-            from: process.env.RESEND_FROM_EMAIL, // stored in .env
+            from: process.env.RESEND_FROM_EMAIL,
             to: newUser.email,
-            subject: 'Verify your account',
+            subject: "Verify your account",
             html: `
                 <h2>Welcome, ${newUser.firstName}!</h2>
-                <p>Thank you for registering. Please verify your email by clicking the link
-                below:</p>
+                <p>Please verify your email:</p>
                 <a href="${verificationUrl}">${verificationUrl}</a>
             `
         });
-        
-        // 6. Simulated verification link
-        res.send(`
-            <h2>Registration Successful!</h2>
-            <p>Please verify your account before logging in.</p>
-            <p><a href="/users/verify/${token}">Click here to verify</a></p>
-        `);
+
+        return res.send("Registration successful! Please check your email to verify your account.");
+
     } catch (err) {
-        console.error("Error saving user:", err);
+        console.error("Error during registration:", err);
         res.send("Something went wrong.");
     }
 });
 
-// Email Verification Route
+/* -------------------------------------------
+   EMAIL VERIFICATION
+------------------------------------------- */
 router.get('/verify/:token', async (req, res) => {
     try {
-        const db = req.app.locals.client.db(req.app.locals.dbName);
+        const db = await getDB();
         const usersCollection = db.collection('users');
-        
-        // 1. Find user by token
+
         const user = await usersCollection.findOne({ verificationToken: req.params.token });
-        
-        // 2. Check if token exists
+
+        //  INVALID TOKEN UI
         if (!user) {
-            return res.send("Invalid or expired verification link.");
+            return res.send(`
+                <div style="
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background: #f5f5f5;
+                ">
+                    <div style="
+                        background: white;
+                        padding: 40px;
+                        max-width: 420px;
+                        width: 100%;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                        text-align: center;
+                    ">
+                        <h1 style="color: #e74c3c; margin-bottom: 10px;">✖ Invalid Link</h1>
+                        <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
+                            This verification link is invalid or has already been used.
+                        </p>
+
+                        <a href="/users/register" style="
+                            display: inline-block;
+                            padding: 12px 25px;
+                            background-color: #3498db;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 6px;
+                            font-size: 16px;
+                        ">Register Again</a>
+                    </div>
+                </div>
+            `);
         }
-        
-        // 3. Check if token is still valid
+
+        // EXPIRED TOKEN UI
         if (user.tokenExpiry < new Date()) {
-            return res.send("Verification link has expired. Please register again.");
+            return res.send(`
+                <div style="
+                    font-family: Arial, sans-serif;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background: #f5f5f5;
+                ">
+                    <div style="
+                        background: white;
+                        padding: 40px;
+                        max-width: 420px;
+                        width: 100%;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                        text-align: center;
+                    ">
+                        <h1 style="color: #f39c12; margin-bottom: 10px;">⚠ Link Expired</h1>
+                        <p style="font-size: 16px; color: #555; margin-bottom: 25px;">
+                            Your verification link has expired. Please register again to receive a new one.
+                        </p>
+
+                        <a href="/users/register" style="
+                            display: inline-block;
+                            padding: 12px 25px;
+                            background-color: #3498db;
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 6px;
+                            font-size: 16px;
+                        ">Register Again</a>
+                    </div>
+                </div>
+            `);
         }
-        
-        // 4. Update user as verified
+
+        // ✔ SUCCESS – VERIFIED
         await usersCollection.updateOne(
             { verificationToken: req.params.token },
-            { $set: { isEmailVerified: true }, $unset: { verificationToken: "", tokenExpiry:"" } }
+            { $set: { isEmailVerified: true }, $unset: { verificationToken: "", tokenExpiry: "" } }
         );
-        
-        res.send(`
-        <h2>Email Verified!</h2>
-        <p>Your account has been verified successfully.</p>
-        <a href="/users/login">Proceed to Login</a>
-        `);
+
+        return res.render('message', {
+            title: "Registration Successful",
+            message: `Please check your email to verify your account.`,
+            type: "success", // optional: can be 'success', 'error', 'info'
+            redirectUrl: "/users/login", // optional button to go to login
+            buttonText: "Go to Login"
+        });
+
     } catch (err) {
-        console.error("Error verifying user:", err);
-        res.send("Something went wrong during verification.");
+        console.error("Verification error:", err);
+        res.send("Something went wrong.");
     }
 });
 
-// Show all registered users
+
+/* -------------------------------------------
+   SHOW ALL USERS
+------------------------------------------- */
 router.get('/list', async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
-        
-        const users = await usersCollection.find().toArray();
-        
-        res.render('users-list', { title: "Registered Users", users: users });
+        const db = await getDB();
+        const users = await db.collection('users').find().toArray();
+
+        res.render('users-list', { title: "Registered Users", users });
     } catch (err) {
-        console.error("Error fetching users:", err);
+        console.error(err);
         res.send("Something went wrong.");
     }
 });
 
-// Show edit form
+/* -------------------------------------------
+   EDIT USER FORM
+------------------------------------------- */
 router.get('/edit/:id', async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
-        const user = await usersCollection.findOne({ _id: new
-        ObjectId(req.params.id) });
-        
-        if (!user) {
-            return res.send("User not found.");
-        }
-        
-        res.render('edit-user', { title: "Edit User", user: user });
+        const db = await getDB();
+        const user = await db.collection('users').findOne({ _id: new ObjectId(req.params.id) });
+
+        if (!user) return res.send("User not found.");
+
+        res.render('edit-user', { title: "Edit User", user });
     } catch (err) {
-        console.error("Error loading user:", err);
+        console.error(err);
         res.send("Something went wrong.");
     }
 });
 
-// Handle update form
+/* -------------------------------------------
+   SAVE EDITED USER
+------------------------------------------- */
 router.post('/edit/:id', async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
-        
-        await usersCollection.updateOne(
+        const db = await getDB();
+        await db.collection('users').updateOne(
             { _id: new ObjectId(req.params.id) },
-            { $set: { name: req.body.name, email: req.body.email } }
+            {
+                $set: {
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    email: req.body.email,
+                    updatedAt: new Date()
+                }
+            }
         );
 
         res.redirect('/users/list');
     } catch (err) {
-        console.error("Error updating user:", err);
+        console.error(err);
         res.send("Something went wrong.");
     }
 });
 
-// Delete user
+/* -------------------------------------------
+   DELETE USER
+------------------------------------------- */
 router.post('/delete/:id', async (req, res) => {
     try {
-        await client.connect();
-        const db = client.db(dbName);
-        const usersCollection = db.collection('users');
-        await usersCollection.deleteOne({ _id: new ObjectId(req.params.id) });
-        
+        const db = await getDB();
+        await db.collection('users').deleteOne({ _id: new ObjectId(req.params.id) });
         res.redirect('/users/list');
     } catch (err) {
-        console.error("Error deleting user:", err);
+        console.error(err);
         res.send("Something went wrong.");
     }
 });
 
-// Show login form
+/* -------------------------------------------
+   LOGIN
+------------------------------------------- */
 router.get('/login', (req, res) => {
     res.render('login', { title: "Login", message: req.query.message });
 });
 
-// Handle login form submission
 router.post('/login', async (req, res) => {
     try {
-        const db = req.app.locals.client.db(req.app.locals.dbName);
+        const db = await getDB();
         const usersCollection = db.collection('users');
-        
-        // Find user by email
+
         const user = await usersCollection.findOne({ email: req.body.email });
         if (!user) return res.send("User not found.");
-        
-        // Check if account is active
-        if (user.accountStatus !== 'active') return res.send("Account is not active.");
 
-        // Check if email is verified
-        if (!user.isEmailVerified) return res.send("Please verify your email before logging in.");
-        
-        // Compare hashed password
-        const isPasswordValid = await bcrypt.compare(req.body.password,
-        user.passwordHash);
-        if (isPasswordValid) {
-            // Store session
-            req.session.user = {
-                userId: user.userId,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                role: user.role
-            };
-            res.redirect('/users/dashboard');
-        } else {
-            res.send("Invalid password.");
-        }
+        if (user.accountStatus !== "active") return res.send("Account is not active.");
+        if (!user.isEmailVerified) return res.send("Please verify your email first.");
+
+        const valid = await bcrypt.compare(req.body.password, user.passwordHash);
+
+        if (!valid) return res.send("Invalid password.");
+
+        req.session.user = {
+            userId: user.userId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            role: user.role
+        };
+
+        res.redirect('/users/dashboard');
+
     } catch (err) {
-        console.error("Error during login:", err);
+        console.error("Login error:", err);
         res.send("Something went wrong.");
     }
 });
 
-// Dashboard route
+/* -------------------------------------------
+   DASHBOARD
+------------------------------------------- */
 router.get('/dashboard', (req, res) => {
-    if (!req.session.user) 
-        return res.redirect('/users/login?message=' + encodeURIComponent('Your session has expired. Please log in to access the dashboard again.'));
+    if (!req.session.user)
+        return res.redirect('/users/login?message=' + encodeURIComponent("Session expired. Please log in again."));
     res.render('dashboard', { title: "User Dashboard", user: req.session.user });
 });
 
-// Logout route
+/* -------------------------------------------
+   LOGOUT
+------------------------------------------- */
 router.get('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if(err) {
-            console.error("Error destroying session:", err);
-            return res.send("Something went wrong during logout.");
-        }
-        res.redirect('/users/login?message=' + encodeURIComponent('You have been logged out successfully!'));
+    req.session.destroy(() => {
+        res.redirect('/users/login?message=' + encodeURIComponent("Logged out successfully."));
     });
 });
 
-// Admin view
+/* -------------------------------------------
+   ADMIN PAGE
+------------------------------------------- */
 router.get('/admin', async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'admin') {
         return res.status(403).send("Access denied.");
     }
 
-    const db = req.app.locals.client.db(req.app.locals.dbName);
+    const db = await getDB();
     const users = await db.collection('users').find().toArray();
-    
+
     res.render('admin', {
         title: "Admin Dashboard",
         users,

@@ -166,6 +166,55 @@ input[type="password"] {
     font-family: inherit;
 }
 
+/* Input with inline toggle (eye) */
+.input-with-toggle {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.input-with-toggle input[type="password"],
+.input-with-toggle input[type="text"] {
+    padding-right: 44px; /* space for the toggle button */
+}
+
+.toggle-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    z-index: 2;
+    color: #667eea;
+}
+
+.toggle-btn:hover {
+    background: transparent; /* keep it subtle */
+}
+
+.toggle-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.08);
+}
+
+.toggle-icon {
+    pointer-events: none;
+    user-select: none;
+    display: inline-block;
+}
+
+/* Ensure SVG icons inherit color */
+.toggle-icon svg { display: block; color: inherit; stroke: currentColor; width:16px; height:16px; }
+
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus {
@@ -409,6 +458,49 @@ tbody tr:last-child td {
     content: '✓';
     color: #38a169;
 }
+
+/* Example styles to match your existing design */
+.message-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.message-box {
+  background: #fff;
+  padding: 40px;
+  max-width: 420px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.message-box.success h1 {
+  color: #27ae60;
+}
+
+.message-box.error h1 {
+  color: #e74c3c;
+}
+
+.message-box.info h1 {
+  color: #3498db;
+}
+
+.message-box .btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
 
 /* Links */
 a {

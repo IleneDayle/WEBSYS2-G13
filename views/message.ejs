@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css"><!-- your CSS -->
+</head>
+<body>
+  <div class="message-container">
+    <div class="message-box <%= type %>">
+      <h1><%= title %></h1>
+      <p><%= message %></p>
+      <% if (redirectUrl) { %>
+        <a href="<%= redirectUrl %>" class="btn"><%= buttonText %></a>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

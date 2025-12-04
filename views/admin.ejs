@@ -167,7 +167,6 @@
                     <table id="usersTable">
                         <thead>
                             <tr>
-                                <th>User ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Role</th>
@@ -180,7 +179,6 @@
                         <tbody>
                             <% users.forEach(user => { %>
                                 <tr data-user-role="<%= user.role %>" data-user-verified="<%= user.isEmailVerified %>">
-                                    <td style="font-family: monospace; font-size: 0.85em;"><%= user.userId.substring(0, 8) %>...</td>
                                     <td><%= user.firstName %> <%= user.lastName %></td>
                                     <td><%= user.email %></td>
                                     <td>
@@ -200,11 +198,11 @@
                                     </td>
                                     <td><%= new Date(user.createdAt).toLocaleDateString() %></td>
                                     <td>
-                                        <button onclick="viewUserDetails('<%= user.userId %>')" 
+                                        <button onclick="viewUserDetails('<%= user.email %>')" 
                                                 style="padding: 6px 12px; font-size: 0.8em; margin-right: 4px;">
                                             View
                                         </button>
-                                        <button onclick="toggleUserStatus('<%= user.userId %>')" 
+                                        <button onclick="toggleUserStatus('<%= user.email %>')" 
                                                 style="padding: 6px 12px; font-size: 0.8em; background: #f56565;">
                                             <%= user.accountStatus === 'active' ? 'Suspend' : 'Activate' %>
                                         </button>
