@@ -1,97 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://localhost:3000/</loc>
+    <loc>https://spincyclelaundry.onrender.com/</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/about</loc>
+    <loc>https://spincyclelaundry.onrender.com/about</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/contact</loc>
+    <loc>https://spincyclelaundry.onrender.com/contact</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/services/book</loc>
+    <loc>https://spincyclelaundry.onrender.com/services/book</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/users/login</loc>
+    <loc>https://spincyclelaundry.onrender.com/users/login</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>never</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/users/register</loc>
+    <loc>https://spincyclelaundry.onrender.com/users/register</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>never</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/password/forgot</loc>
+    <loc>https://spincyclelaundry.onrender.com/password/forgot</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>never</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/users/dashboard</loc>
+    <loc>https://spincyclelaundry.onrender.com/users/dashboard</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/orders/my</loc>
+    <loc>https://spincyclelaundry.onrender.com/orders/my</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/billing</loc>
+    <loc>https://spincyclelaundry.onrender.com/billing</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/support</loc>
+    <loc>https://spincyclelaundry.onrender.com/support</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/users/admin</loc>
+    <loc>https://spincyclelaundry.onrender.com/users/admin</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/admin/orders</loc>
+    <loc>https://spincyclelaundry.onrender.com/admin/orders</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/admin/payments</loc>
+    <loc>https://spincyclelaundry.onrender.com/admin/payments</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/admin/manage-services</loc>
+    <loc>https://spincyclelaundry.onrender.com/admin/manage-services</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>http://localhost:3000/admin/support</loc>
+    <loc>https://spincyclelaundry.onrender.com/admin/support</loc>
     <lastmod>2025-12-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
