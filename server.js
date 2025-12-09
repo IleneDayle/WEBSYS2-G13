@@ -48,7 +48,7 @@ app.get('/robots.txt', (req, res) => {
     res.send(robotsTxt);
 });
 
-app.use('/public', express.static('public'));
+app.use(express.static('public'));
 
 // Session setup
 app.use(session({
