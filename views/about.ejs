@@ -224,6 +224,66 @@
             box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
         
+        .team-section {
+            margin-top: 50px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .team-section h2 {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .team-member {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+        
+        .team-member img {
+            width: 100%;
+            max-width: 220px;
+            height: 220px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid #667eea;
+        }
+        
+        .team-member h3 {
+            font-size: 1.3em;
+            color: #1a202c;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .team-member p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
         .footer {
             background: #1a202c;
             color: white;
@@ -342,6 +402,25 @@
             <div style="text-align: center; margin-top: 50px;">
                 <a href="/services" class="cta-button">Explore Our Services</a>
                 <a href="/support" class="cta-button" style="margin-left: 10px; background: transparent; color: #667eea; border: 2px solid #667eea;">Contact Us</a>
+            </div>
+
+            <div class="team-section">
+                <h2>Meet Our Team</h2>
+                <p style="text-align: center; color: #666; font-size: 1.1em; margin-bottom: 30px;">
+                    <%= description %>
+                </p>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="/public/images/ilene.jpeg" alt="Ilene Dayle Aquino">
+                        <h3>Ilene Dayle Aquino</h3>
+                        <p>3rd Year Student<br>Bachelor of Science in Computer Science<br>University of Baguio</p>
+                    </div>
+                    <div class="team-member">
+                        <img src="/public/images/eloisa.jpg" alt="Eloisa Segundo">
+                        <h3>Eloisa Segundo</h3>
+                        <p>3rd Year Student<br>Bachelor of Science in Computer Science<br>University of Baguio</p>
+                    </div>
+                </div>
             </div>
 
             <div class="footer">
