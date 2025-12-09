@@ -25,7 +25,7 @@ process.on('uncaughtException', (err) => {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
-app.use(express.static('public'))
+app.use('/public', express.static('public'));
 
 // Session setup
 app.use(session({

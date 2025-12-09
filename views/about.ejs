@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>About Us - SpinCycle Laundry</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Learn more about <%= name %> — web systems developer and student innovator.">
+    <meta name="keywords" content="about page, web systems, EJS, SEO, student project">
+    <meta name="author" content="<%= name %>">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="About <%= name %>">
+    <meta property="og:description" content="<%= description %>">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/public/images/profile.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #1a202c;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar .brand {
+            display: flex;
+            align-items: center;
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #667eea;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+        
+        .navbar .brand a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 32px;
+        }
+        
+        .navbar ul li a {
+            color: #1a202c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .navbar ul li a:hover,
+        .navbar ul li a.active {
+            color: #667eea;
+        }
+        
+        .navbar .auth {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .navbar .auth a {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95em;
+            border-radius: 25px;
+            padding: 10px 24px;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar .auth a:first-child {
+            color: #667eea;
+            background: transparent;
+            border: 2px solid #667eea;
+        }
+        
+        .navbar .auth a:first-child:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .navbar .auth a:last-child {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        
+        .navbar .auth a:last-child:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .main-content {
+            min-height: calc(100vh - 80px);
+            background: white;
+            border-radius: 32px 32px 0 0;
+            padding: 60px 40px;
+            margin-top: 0;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 50px;
+            font-weight: 500;
+        }
+        
+        .about-section {
+            margin-bottom: 50px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .about-section h2 {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .about-section p {
+            color: #4a5568;
+            font-size: 1.05em;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+        
+        .about-section p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .values {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .value-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+        }
+        
+        .value-card h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .value-card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .footer {
+            background: #1a202c;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            border-radius: 16px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .subtitle {
+                font-size: 1em;
+            }
+            
+            .about-section {
+                padding: 20px;
+            }
+            
+            .navbar ul {
+                gap: 16px;
+                font-size: 0.9em;
+            }
+            
+            .main-content {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <a href="/">🌀 SpinCycle</a>
+        </div>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about" class="active">About</a></li>
+            <li><a href="/services">Services</a></li>
+            <li><a href="/support">Support</a></li>
+        </ul>
+        <div class="auth">
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>About SpinCycle Laundry</h1>
+            <p class="subtitle">Your Trusted Partner in Laundry Care</p>
+
+            <div class="about-section">
+                <h2>Our Story</h2>
+                <p>
+                    SpinCycle Laundry was founded with a simple mission: to make professional laundry services 
+                    accessible and convenient for everyone. We understand that laundry can be a time-consuming 
+                    chore, which is why we're here to handle it for you with care and precision.
+                </p>
+                <p>
+                    With years of experience in the laundry industry, our team is dedicated to delivering 
+                    exceptional results while maintaining the highest standards of cleanliness and customer service.
+                </p>
+            </div>
+
+            <div class="about-section">
+                <h2>Our Core Values</h2>
+                <div class="values">
+                    <div class="value-card">
+                        <div class="icon">✨</div>
+                        <h3>Quality</h3>
+                        <p>We deliver pristine results using premium cleaning products and advanced techniques.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="icon">⚡</div>
+                        <h3>Reliability</h3>
+                        <p>Consistent service you can count on, every single time. Your trust is our priority.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="icon">💚</div>
+                        <h3>Care</h3>
+                        <p>We treat your garments like our own, handling each piece with utmost attention and care.</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="icon">🚀</div>
+                        <h3>Innovation</h3>
+                        <p>Leveraging latest technology to provide faster, safer, and more efficient laundry solutions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-section">
+                <h2>Why Choose Us?</h2>
+                <p>
+                    <strong>Professional Expertise:</strong> Our trained staff brings years of experience in handling various fabric types and stains.
+                </p>
+                <p>
+                    <strong>Fast Turnaround:</strong> We understand that time is precious. We offer quick processing without compromising on quality.
+                </p>
+                <p>
+                    <strong>Eco-Friendly:</strong> We use environmentally responsible cleaning methods and sustainable practices.
+                </p>
+                <p>
+                    <strong>Convenient Online Platform:</strong> Schedule pickups, track orders, and manage your account all from your smartphone.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="/services" class="cta-button">Explore Our Services</a>
+                <a href="/support" class="cta-button" style="margin-left: 10px; background: transparent; color: #667eea; border: 2px solid #667eea;">Contact Us</a>
+            </div>
+
+            <div class="footer">
+                <p><strong>SpinCycle Laundry</strong></p>
+                <p>Making your life easier, one spin at a time.</p>
+                <p style="margin-top: 15px; font-size: 0.85em; color: #aaa;">© 2025 SpinCycle Laundry. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
