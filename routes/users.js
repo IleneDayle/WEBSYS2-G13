@@ -353,8 +353,9 @@ router.get('/dashboard', (req, res) => {
     if (!req.session.user)
         return res.redirect('/users/login?message=' + encodeURIComponent("Session expired. Please log in again."));
     
-    // For customer dashboard, render simple welcome page
-    // Users can view their actual orders on the /orders/my page
+    // Render dashboard for both admins and customers
+    // Admins will see quick actions to manage content
+    // Customers will see their personal options
     res.render('dashboard', { 
         title: "User Dashboard", 
         user: req.session.user,

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel="stylesheet" href="/public/css/styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .admin-container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 30px;
+                font-size: 2em;
+            }
+            .form-group {
+                margin-bottom: 24px;
+            }
+            label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 600;
+                font-size: 0.95em;
+            }
+            input, textarea, select {
+                width: 100%;
+                padding: 12px 14px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 0.95em;
+                font-family: inherit;
+                background: white;
+                box-sizing: border-box;
+                transition: all 0.3s ease;
+            }
+            input:focus, textarea:focus, select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            textarea {
+                resize: vertical;
+                min-height: 120px;
+            }
+            .form-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .form-group.full {
+                grid-column: 1 / -1;
+            }
+            .button-group {
+                display: flex;
+                gap: 12px;
+                margin-top: 30px;
+                justify-content: flex-start;
+            }
+            .btn {
+                padding: 12px 24px;
+                border-radius: 8px;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 1em;
+                cursor: pointer;
+                border: none;
+                transition: all 0.3s ease;
+                min-width: 120px;
+                text-align: center;
+            }
+            .btn-submit {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            }
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            }
+            .btn-cancel {
+                background: #e2e8f0;
+                color: #667eea;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            }
+            .btn-cancel:hover {
+                background: #cbd5e0;
+                transform: translateY(-2px);
+            }
+            .message {
+                padding: 16px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                font-weight: 500;
+            }
+            .message.error {
+                background: #fed7d7;
+                color: #c53030;
+                border: 1px solid #fc8181;
+            }
+            .message.info {
+                background: #e0e7ff;
+                color: #667eea;
+                border: 1px solid #667eea;
+            }
+            .form-wrapper {
+                background: white;
+                padding: 30px;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            .navbar .brand a {
+                color: #667eea;
+                text-decoration: none;
+            }
+            @media (max-width: 768px) {
+                .form-row {
+                    grid-template-columns: 1fr;
+                }
+                .admin-container {
+                    padding: 20px 10px;
+                }
+                .form-wrapper {
+                    padding: 20px;
+                }
+                .button-group {
+                    flex-direction: column;
+                }
+                .btn {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar">
+            <span class="brand"><a href="/users/admin">🌀 SpinCycle Admin</a></span>
+            <div class="auth"><a href="/admin/manage-services">← Back to Services</a><a href="/users/logout">Logout</a></div>
+        </nav>
+        <div class="main-content">
+            <div class="admin-container">
+                <h1><%= (service && service._id) ? '✏️ Edit Service' : '➕ Add New Service' %></h1>
+
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="message error"><%= error %></div>
+                <% } %>
+
+                <div class="form-wrapper">
+                    <form method="POST" action="/admin/manage-services/save">
+                        <% if (service && service._id) { %>
+                            <input type="hidden" name="serviceId" value="<%= service._id %>">
+                        <% } %>
+
+                        <div class="form-group">
+                            <label for="name">Service Name <span style="color: #e53e3e;">*</span></label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                value="<%= service && service.name ? service.name : '' %>" 
+                                required
+                                placeholder="e.g., Wash & Fold"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description <span style="color: #e53e3e;">*</span></label>
+                            <textarea 
+                                id="description" 
+                                name="description" 
+                                required
+                                placeholder="Describe what this service includes"
+                            ><%= service && service.description ? service.description : '' %></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="price">Price (₱) <span style="color: #e53e3e;">*</span></label>
+                            <input 
+                                type="number" 
+                                id="price" 
+                                name="price" 
+                                value="<%= service && service.price ? service.price : '' %>" 
+                                required
+                                placeholder="0.00"
+                                step="0.01"
+                                min="0"
+                            >
+                        </div>
+
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-submit">
+                                <%= (service && service._id) ? '💾 Update Service' : '➕ Create Service' %>
+                            </button>
+                            <a href="/admin/manage-services" class="btn btn-cancel">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer><p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p></footer>
+    </body>
+</html>

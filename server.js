@@ -25,6 +25,19 @@ process.on('uncaughtException', (err) => {
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
+
+// Sitemap and Robots.txt for SEO (BEFORE static middleware)
+app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml');
+    res.sendFile(__dirname + '/public/sitemap.xml');
+});
+
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    const robotsTxt = `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /users/login\nDisallow: /users/register\nDisallow: /password/\n\nSitemap: http://localhost:3000/sitemap.xml`;
+    res.send(robotsTxt);
+});
+
 app.use('/public', express.static('public'));
 
 // Session setup

@@ -4,59 +4,232 @@
         <title><%= title %></title>
         <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .admin-container {
+                max-width: 1400px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 30px;
+                font-size: 2em;
+            }
+            .table-wrapper {
+                overflow-x: auto;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                min-width: 1200px;
+            }
+            table thead {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                position: sticky;
+                top: 0;
+            }
+            table th {
+                padding: 16px;
+                text-align: left;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+            table td {
+                padding: 14px 16px;
+                border-bottom: 1px solid #e2e8f0;
+                background: white !important;
+            }
+            table tbody tr:hover {
+                background: #f8f9fa;
+            }
+            table a {
+                color: #667eea;
+                text-decoration: none;
+                font-weight: 500;
+                word-break: break-all;
+            }
+            table a:hover {
+                text-decoration: underline;
+            }
+            .message {
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 500;
+            }
+            .message.info {
+                background: #e0e7ff;
+                color: #667eea;
+                border: 1px solid #667eea;
+            }
+            .actions-cell {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                background: transparent !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+            .action-row {
+                display: flex;
+                gap: 8px;
+                flex-wrap: nowrap;
+                background: transparent !important;
+                padding: 0 !important;
+                border: none !important;
+                align-items: center;
+                justify-content: flex-start;
+            }
+            .action-row select {
+                flex: 0 1 auto;
+            }
+            .action-row button {
+                flex: 0 0 auto;
+            }
+            .actions-cell form {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            select, button {
+                padding: 8px 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                font-size: 0.8em;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-family: inherit;
+            }
+            select {
+                min-width: 100px;
+                background: white;
+                color: #2d3748;
+                font-weight: 500;
+                border: 1px solid #cbd5e0;
+            }
+            select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            button {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                font-weight: 600;
+                white-space: nowrap;
+                padding: 9px 16px;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            }
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+            }
+            button:active {
+                transform: translateY(0);
+            }
+            .btn-refund {
+                background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%) !important;
+                box-shadow: 0 2px 8px rgba(245, 101, 101, 0.2) !important;
+            }
+            .btn-refund:hover {
+                box-shadow: 0 4px 16px rgba(245, 101, 101, 0.4) !important;
+            }
+            form {
+                display: inline;
+            }
+            .navbar .brand a {
+                color: #667eea;
+                text-decoration: none;
+            }
+            @media (max-width: 768px) {
+                .admin-container {
+                    padding: 20px 10px;
+                }
+                table th, table td {
+                    padding: 10px 8px;
+                    font-size: 0.9em;
+                }
+                select, button {
+                    font-size: 0.75em;
+                    padding: 6px 8px;
+                }
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar">
-            <span class="brand"><a href="/users/admin">Admin</a></span>
-            <div class="auth"><a href="/users/logout">Logout</a></div>
+            <span class="brand"><a href="/users/admin">🌀 SpinCycle Admin</a></span>
+            <div class="auth"><a href="/">Home</a><a href="/users/logout">Logout</a></div>
         </nav>
         <div class="main-content">
-            <h1>All Orders</h1>
-            <div style="max-width:1000px; margin:20px auto;">
+            <div class="admin-container">
+                <h1>📦 All Orders</h1>
                 <% if (!orders || orders.length === 0) { %>
                     <div class="message info">No orders found.</div>
                 <% } else { %>
-                    <table>
-                        <thead><tr><th>ID</th><th>User</th><th>Service</th><th>Pickup</th><th>Price</th><th>Status</th><th>Payment</th><th>Actions</th></tr></thead>
-                        <tbody>
-                        <% orders.forEach(o => { %>
-                            <tr>
-                                <td><a href="/orders/<%= o._id %>"><%= o._id %></a></td>
-                                <td><%= o.userEmail %></td>
-                                <td><%= o.serviceName %></td>
-                                <td><%= o.pickupDate ? new Date(o.pickupDate).toLocaleString() : '-' %></td>
-                                <td>₱<%= o.price %></td>
-                                <td><%= o.status %></td>
-                                <td><%= o.paymentStatus %></td>
-                                <td>
-                                    <form method="POST" action="/admin/orders/<%= o._id %>/status" style="display:inline-block; margin-right:6px;">
-                                        <select name="status" style="padding:6px;">
-                                            <option value="pending" <%= o.status==='pending' ? 'selected' : '' %>>Pending</option>
-                                            <option value="processing" <%= o.status==='processing' ? 'selected' : '' %>>Processing</option>
-                                            <option value="completed" <%= o.status==='completed' ? 'selected' : '' %>>Completed</option>
-                                            <option value="cancelled" <%= o.status==='cancelled' ? 'selected' : '' %>>Cancelled</option>
-                                        </select>
-                                        <button type="submit">Update</button>
-                                    </form>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User Email</th>
+                                    <th>Service</th>
+                                    <th>Pickup Date</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% orders.forEach(o => { %>
+                                    <tr>
+                                        <td><a href="/orders/<%= o._id %>"><%= o._id.toString().substring(0, 8) %>...</a></td>
+                                        <td><%= o.userEmail %></td>
+                                        <td><%= o.serviceName %></td>
+                                        <td><%= o.pickupDate ? new Date(o.pickupDate).toLocaleString() : '-' %></td>
+                                        <td>₱<%= o.price %></td>
+                                        <td><%= o.status %></td>
+                                        <td><%= o.paymentStatus %></td>
+                                        <td>
+                                            <div class="actions-cell">
+                                                <div class="action-row">
+                                                    <form method="POST" action="/admin/orders/<%= o._id %>/status">
+                                                        <select name="status">
+                                                            <option value="pending" <%= o.status==='pending' ? 'selected' : '' %>>Pending</option>
+                                                            <option value="processing" <%= o.status==='processing' ? 'selected' : '' %>>Processing</option>
+                                                            <option value="completed" <%= o.status==='completed' ? 'selected' : '' %>>Completed</option>
+                                                            <option value="cancelled" <%= o.status==='cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                        </select>
+                                                        <button type="submit">Update</button>
+                                                    </form>
+                                                </div>
 
-                                    <form method="POST" action="/admin/orders/<%= o._id %>/complete" style="display:inline-block; margin-right:6px;">
-                                        <button type="submit">Mark Complete</button>
-                                    </form>
+                                                <form method="POST" action="/admin/orders/<%= o._id %>/complete">
+                                                    <button type="submit">Complete</button>
+                                                </form>
 
-                                    <% if (o.paymentStatus === 'paid') { %>
-                                        <form method="POST" action="/admin/orders/<%= o._id %>/refund" style="display:inline-block;">
-                                            <input type="hidden" name="amount" value="<%= o.price %>">
-                                            <button type="submit" style="background:#f56565; color:white;">Refund</button>
-                                        </form>
-                                    <% } %>
-                                </td>
-                            </tr>
-                        <% }) %>
-                        </tbody>
-                    </table>
+                                                <% if (o.paymentStatus === 'paid') { %>
+                                                    <form method="POST" action="/admin/orders/<%= o._id %>/refund">
+                                                        <input type="hidden" name="amount" value="<%= o.price %>">
+                                                        <button type="submit" class="btn-refund">Refund</button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
                 <% } %>
             </div>
         </div>
-        <footer><p>&copy; 2025 SpinCycle Laundry.</p></footer>
+        <footer><p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p></footer>
     </body>
 </html>

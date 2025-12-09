@@ -235,4 +235,85 @@ router.post('/services/delete/:id', async (req, res) => {
     }
 });
 
+// PRODUCTS MANAGEMENT
+router.get('/manage-services', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    try {
+        const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
+        const services = await db.collection('services').find().sort({ createdAt: -1 }).toArray();
+        res.render('admin-manage-services', { title: 'Manage Services', services, currentUser: req.session.user });
+    } catch (err) {
+        console.error('Admin services error:', err);
+        res.render('message', { title: 'Error', message: 'Could not load services.', type: 'error', redirectUrl: '/users/admin', buttonText: 'Back' });
+    }
+});
+
+router.get('/manage-services/new', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    res.render('admin-service-form', { title: 'Add New Service', service: null, currentUser: req.session.user });
+});
+
+router.get('/manage-services/edit/:id', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    try {
+        const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
+        const service = await db.collection('services').findOne({ _id: new ObjectId(req.params.id) });
+        if (!service) return res.render('message', { title: 'Not Found', message: 'Service not found.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+
+        res.render('admin-service-form', { title: 'Edit Service', service, currentUser: req.session.user });
+    } catch (err) {
+        console.error('Admin service edit error:', err);
+        res.render('message', { title: 'Error', message: 'Could not load service.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+    }
+});
+
+router.post('/manage-services/save', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    try {
+        const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
+        const { serviceId, name, description, price } = req.body;
+
+        const serviceData = {
+            name: name,
+            description: description,
+            price: parseFloat(price),
+            updatedAt: new Date()
+        };
+
+        if (serviceId && serviceId !== '') {
+            // Update existing service
+            await db.collection('services').updateOne(
+                { _id: new ObjectId(serviceId) },
+                { $set: serviceData }
+            );
+            res.redirect('/admin/manage-services?success=Service updated successfully');
+        } else {
+            // Create new service
+            serviceData.createdAt = new Date();
+            await db.collection('services').insertOne(serviceData);
+            res.redirect('/admin/manage-services?success=Service created successfully');
+        }
+    } catch (err) {
+        console.error('Admin service save error:', err);
+        res.render('message', { title: 'Error', message: 'Could not save service.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+    }
+});
+
+router.post('/manage-services/delete/:id', async (req, res) => {
+    if (!req.session.user || req.session.user.role !== 'admin') return res.status(403).render('message', { title: 'Access Denied', message: 'Access denied.', type: 'error', redirectUrl: '/', buttonText: 'Home' });
+
+    try {
+        const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
+        await db.collection('services').deleteOne({ _id: new ObjectId(req.params.id) });
+        res.redirect('/admin/manage-services?success=Service deleted successfully');
+    } catch (err) {
+        console.error('Admin service delete error:', err);
+        res.render('message', { title: 'Error', message: 'Could not delete service.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+    }
+});
+
 module.exports = router;

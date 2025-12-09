@@ -4,47 +4,159 @@
         <title><%= title %></title>
         <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .admin-container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 30px;
+                font-size: 2em;
+            }
+            .ticket-card {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+                margin-bottom: 16px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+                transition: all 0.3s ease;
+            }
+            .ticket-card:hover {
+                box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+            }
+            .ticket-subject {
+                font-weight: 600;
+                color: #1a202c;
+                font-size: 1.1em;
+                margin-bottom: 8px;
+            }
+            .ticket-meta {
+                font-size: 0.85em;
+                color: #64748b;
+                margin-bottom: 12px;
+            }
+            .ticket-message {
+                color: #2d3748;
+                margin-bottom: 12px;
+                line-height: 1.5;
+            }
+            .ticket-responses {
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px dashed #e2e8f0;
+            }
+            .response-item {
+                background: #f8f9fa;
+                padding: 10px;
+                border-radius: 6px;
+                margin-bottom: 8px;
+                font-size: 0.9em;
+            }
+            .response-header {
+                font-weight: 600;
+                color: #1a202c;
+                margin-bottom: 4px;
+            }
+            .response-text {
+                color: #2d3748;
+            }
+            .response-form {
+                margin-top: 12px;
+                display: grid;
+                gap: 8px;
+            }
+            .response-form label {
+                font-weight: 500;
+                color: #2d3748;
+                font-size: 0.9em;
+            }
+            textarea {
+                padding: 10px;
+                border: 1px solid #e2e8f0;
+                border-radius: 6px;
+                font-family: inherit;
+                font-size: 0.9em;
+                resize: vertical;
+            }
+            textarea:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+            button {
+                padding: 10px 16px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                align-self: flex-start;
+            }
+            button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            }
+            .message {
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 500;
+                background: #e0e7ff;
+                color: #667eea;
+                border: 1px solid #667eea;
+            }
+            .navbar .brand a {
+                color: #667eea;
+                text-decoration: none;
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar">
-            <span class="brand"><a href="/users/admin">Admin</a></span>
-            <div class="auth"><a href="/users/logout">Logout</a></div>
+            <span class="brand"><a href="/users/admin">🌀 SpinCycle Admin</a></span>
+            <div class="auth"><a href="/">Home</a><a href="/users/logout">Logout</a></div>
         </nav>
         <div class="main-content">
-            <h1>Support Tickets</h1>
+            <div class="admin-container">
+                <h1>🎫 Support Tickets</h1>
             <div style="max-width:900px; margin:20px auto;">
                 <% if (!tickets || tickets.length === 0) { %>
-                    <div class="message info">No support tickets found.</div>
+                    <div class="message">No support tickets found.</div>
                 <% } else { %>
-                    <div style="display:grid; gap:12px;">
-                        <% tickets.forEach(t => { %>
-                            <div style="background:white; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
-                                <strong><%= t.subject %></strong>
-                                <p style="margin:6px 0; color:#64748b;"><%= t.message %></p>
-                                <small><%= t.userEmail %> • <%= new Date(t.createdAt).toLocaleString() %></small>
-                                <% if (t.responses && t.responses.length > 0) { %>
-                                    <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #e2e8f0;">
-                                        <strong>Responses</strong>
-                                        <% t.responses.forEach(r => { %>
-                                            <div style="margin-top:6px;">
-                                                <small><strong><%= r.responder %></strong> • <%= new Date(r.createdAt).toLocaleString() %></small>
-                                                <p style="margin:4px 0; color:#2d3748;"><%= r.message %></p>
-                                            </div>
-                                        <% }) %>
-                                    </div>
-                                <% } %>
+                    <% tickets.forEach(t => { %>
+                        <div class="ticket-card">
+                            <div class="ticket-subject"><%= t.subject %></div>
+                            <div class="ticket-meta"><%= t.userEmail %> • <%= new Date(t.createdAt).toLocaleString() %></div>
+                            <div class="ticket-message"><%= t.message %></div>
+                            
+                            <% if (t.responses && t.responses.length > 0) { %>
+                                <div class="ticket-responses">
+                                    <strong>Responses:</strong>
+                                    <% t.responses.forEach(r => { %>
+                                        <div class="response-item">
+                                            <div class="response-header"><%= r.responder %> • <%= new Date(r.createdAt).toLocaleString() %></div>
+                                            <div class="response-text"><%= r.message %></div>
+                                        </div>
+                                    <% }) %>
+                                </div>
+                            <% } %>
 
-                                <form method="POST" action="/admin/support/respond/<%= t._id %>" style="margin-top:8px;">
-                                    <label for="response-<%= t._id %>">Respond</label>
-                                    <textarea id="response-<%= t._id %>" name="response" rows="3" style="width:100%; padding:8px; border-radius:6px; border:1px solid #e2e8f0;"></textarea>
-                                    <button type="submit" style="margin-top:6px;">Send Response</button>
-                                </form>
-                            </div>
-                        <% }) %>
-                    </div>
+                            <form method="POST" action="/admin/support/respond/<%= t._id %>" class="response-form">
+                                <label for="response-<%= t._id %>">Add Response:</label>
+                                <textarea id="response-<%= t._id %>" name="response" rows="3" placeholder="Type your response..."></textarea>
+                                <button type="submit">Send Response</button>
+                            </form>
+                        </div>
+                    <% }) %>
                 <% } %>
             </div>
+            </div>
         </div>
-        <footer><p>&copy; 2025 SpinCycle Laundry.</p></footer>
+        <footer><p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p></footer>
     </body>
 </html>

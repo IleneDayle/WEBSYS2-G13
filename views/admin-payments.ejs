@@ -4,14 +4,74 @@
         <title><%= title %></title>
         <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .admin-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 30px 20px;
+            }
+            h1 {
+                color: #667eea;
+                margin-bottom: 30px;
+                font-size: 2em;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+            table thead {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+            table th {
+                padding: 16px;
+                text-align: left;
+                font-weight: 600;
+            }
+            table td {
+                padding: 14px 16px;
+                border-bottom: 1px solid #e2e8f0;
+            }
+            table tbody tr:hover {
+                background: #f8f9fa;
+            }
+            table a {
+                color: #667eea;
+                text-decoration: none;
+                font-weight: 500;
+            }
+            table a:hover {
+                text-decoration: underline;
+            }
+            .message {
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+                font-weight: 500;
+            }
+            .message.info {
+                background: #e0e7ff;
+                color: #667eea;
+                border: 1px solid #667eea;
+            }
+            .navbar .brand a {
+                color: #667eea;
+                text-decoration: none;
+            }
+        </style>
     </head>
     <body>
         <nav class="navbar">
-            <span class="brand"><a href="/users/admin">Admin</a></span>
-            <div class="auth"><a href="/users/logout">Logout</a></div>
+            <span class="brand"><a href="/users/admin">🌀 SpinCycle Admin</a></span>
+            <div class="auth"><a href="/">Home</a><a href="/users/logout">Logout</a></div>
         </nav>
         <div class="main-content">
-            <h1>Payments</h1>
+            <div class="admin-container">
+                <h1>💳 Sales Reports</h1>
             <div style="max-width:900px; margin:20px auto;">
                 <% if (!payments || payments.length === 0) { %>
                     <div class="message info">No payments recorded.</div>
@@ -32,7 +92,8 @@
                     </table>
                 <% } %>
             </div>
+            </div>
         </div>
-        <footer><p>&copy; 2025 SpinCycle Laundry.</p></footer>
+        <footer><p>&copy; 2025 SpinCycle Laundry. Making laundry effortless.</p></footer>
     </body>
 </html>

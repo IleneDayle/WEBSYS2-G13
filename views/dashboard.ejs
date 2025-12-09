@@ -220,13 +220,17 @@
                 <!-- Quick Actions -->
                 <h2>Quick Actions</h2>
                 <div class="quick-actions">
-                    <a href="/services/book" class="action-button">Book New Service</a>
-                    <a href="/orders/my" class="action-button">View My Orders</a>
-                    <a href="/users/profile/edit" class="action-button">Edit Profile</a>
-                    <a href="/billing" class="action-button">Billing & Payments</a>
-                    <a href="/support" class="action-button">Contact Support</a>
                     <% if (user.role === 'admin') { %>
-                        <a href="/users/admin" class="action-button">Admin Dashboard</a>
+                        <a href="/admin/orders" class="action-button">Manage Orders</a>
+                        <a href="/admin/payments" class="action-button">Sales Reports</a>
+                        <a href="/admin/manage-services" class="action-button">Manage Services</a>
+                        <a href="/admin/support" class="action-button">Support Tickets</a>
+                    <% } else { %>
+                        <a href="/services/book" class="action-button">Book New Service</a>
+                        <a href="/orders/my" class="action-button">View My Orders</a>
+                        <a href="/users/profile/edit" class="action-button">Edit Profile</a>
+                        <a href="/billing" class="action-button">Billing & Payments</a>
+                        <a href="/support" class="action-button">Contact Support</a>
                     <% } %>
                 </div>
             </div>
