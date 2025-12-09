@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
+const path = require('path');
 const session = require('express-session'); //For user sessions
 require('dotenv').config();
 
@@ -28,8 +29,17 @@ app.set('view engine', 'ejs');
 
 // Sitemap and Robots.txt for SEO (BEFORE static middleware)
 app.get('/sitemap.xml', (req, res) => {
+    const sitemapPath = path.join(__dirname, 'public', 'sitemap.xml');
     res.type('application/xml');
-    res.sendFile(__dirname + '/public/sitemap.xml');
+    res.sendFile(sitemapPath, (err) => {
+        if (err) {
+            console.error('Error sending sitemap.xml:', err && (err.stack || err));
+            if (!res.headersSent) {
+                // Return a plain-text error so the XML parser doesn't try to parse an HTML error page
+                res.status(500).type('text/plain').send('Could not retrieve sitemap');
+            }
+        }
+    });
 });
 
 app.get('/robots.txt', (req, res) => {
