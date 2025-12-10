@@ -349,22 +349,54 @@ router.post('/login', async (req, res) => {
 /* -------------------------------------------
    DASHBOARD
 ------------------------------------------- */
-router.get('/dashboard', (req, res) => {
+router.get('/dashboard', async (req, res) => {
     if (!req.session.user)
         return res.redirect('/users/login?message=' + encodeURIComponent("Session expired. Please log in again."));
-    
-    // Render dashboard for both admins and customers
-    // Admins will see quick actions to manage content
-    // Customers will see their personal options
-    res.render('dashboard', { 
-        title: "User Dashboard", 
-        user: req.session.user,
-        stats: {
-            totalOrders: 0,
-            activeOrders: 0,
-            totalSpent: 0
-        }
-    });
+
+    try {
+        const db = await getDB();
+        const ordersCol = db.collection('orders');
+        const userEmail = req.session.user.email;
+
+        // Total orders for this user
+        const totalOrders = await ordersCol.countDocuments({ userEmail });
+
+        // Active orders (still processing)
+        const activeOrders = await ordersCol.countDocuments({ userEmail, status: 'processing' });
+
+        // Total spent: sum of prices for completed orders
+        const agg = await ordersCol.aggregate([
+            { $match: { userEmail: userEmail, status: 'completed', price: { $exists: true } } },
+            { $group: { _id: null, total: { $sum: "$price" } } }
+        ]).toArray();
+
+        const totalSpentNum = (agg[0] && agg[0].total) ? agg[0].total : 0;
+
+        // Format totalSpent to 2 decimal places and include currency symbol
+        const totalSpent = `₱${Number(totalSpentNum).toFixed(2)}`;
+
+        res.render('dashboard', {
+            title: "User Dashboard",
+            user: req.session.user,
+            stats: {
+                totalOrders,
+                activeOrders,
+                totalSpent
+            }
+        });
+    } catch (err) {
+        console.error('Dashboard load error:', err);
+        // Fallback to zeros if any DB error occurs
+        res.render('dashboard', {
+            title: "User Dashboard",
+            user: req.session.user,
+            stats: {
+                totalOrders: 0,
+                activeOrders: 0,
+                totalSpent: '₱0.00'
+            }
+        });
+    }
 });
 
 /* -------------------------------------------
@@ -390,22 +422,66 @@ router.post('/profile/edit', async (req, res) => {
 
     try {
         const db = await getDB();
+        // Do NOT allow email changes through this form for security and account integrity.
         await db.collection('users').updateOne({ email: req.session.user.email }, { $set: {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            email: req.body.email,
             updatedAt: new Date()
         }});
 
-        // Update session info
+        // Update session info (email remains the same)
         req.session.user.firstName = req.body.firstName;
         req.session.user.lastName = req.body.lastName;
-        req.session.user.email = req.body.email;
 
-        res.render('message', { title: 'Profile Updated', message: 'Your profile has been updated.', type: 'success', redirectUrl: '/users/dashboard', buttonText: 'Back to Dashboard' });
+        res.render('message', { title: 'Profile Updated', message: 'Your profile has been updated. Email changes are not allowed here.', type: 'success', redirectUrl: '/users/dashboard', buttonText: 'Back to Dashboard' });
     } catch (err) {
         console.error('Profile save error:', err);
         res.render('message', { title: 'Error', message: 'Could not save profile.', type: 'error', redirectUrl: '/users/dashboard', buttonText: 'Back' });
+    }
+});
+
+
+/* -------------------------------------------
+   CHANGE PASSWORD
+------------------------------------------- */
+router.post('/profile/change-password', async (req, res) => {
+    if (!req.session.user) return res.redirect('/users/login?message=' + encodeURIComponent('Please log in to change your password.'));
+
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        return res.render('message', { title: 'Invalid Input', message: 'Please fill in all password fields.', type: 'error', redirectUrl: '/users/profile/edit', buttonText: 'Back' });
+    }
+
+    if (newPassword !== confirmPassword) {
+        return res.render('message', { title: 'Password Mismatch', message: 'New password and confirmation do not match.', type: 'error', redirectUrl: '/users/profile/edit', buttonText: 'Back' });
+    }
+
+    if (newPassword.length < 8) {
+        return res.render('message', { title: 'Weak Password', message: 'New password must be at least 8 characters long.', type: 'error', redirectUrl: '/users/profile/edit', buttonText: 'Back' });
+    }
+
+    try {
+        const db = await getDB();
+        const usersCollection = db.collection('users');
+        const user = await usersCollection.findOne({ email: req.session.user.email });
+
+        if (!user) {
+            return res.render('message', { title: 'User Not Found', message: 'User account not found.', type: 'error', redirectUrl: '/users/login', buttonText: 'Login' });
+        }
+
+        const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+        if (!valid) {
+            return res.render('message', { title: 'Authentication Failed', message: 'Current password is incorrect.', type: 'error', redirectUrl: '/users/profile/edit', buttonText: 'Back' });
+        }
+
+        const hashed = await bcrypt.hash(newPassword, saltRounds);
+        await usersCollection.updateOne({ email: user.email }, { $set: { passwordHash: hashed, updatedAt: new Date() } });
+
+        return res.render('message', { title: 'Password Changed', message: 'Your password has been changed successfully.', type: 'success', redirectUrl: '/users/dashboard', buttonText: 'Back to Dashboard' });
+    } catch (err) {
+        console.error('Change password error:', err);
+        return res.render('message', { title: 'Error', message: 'Could not change password.', type: 'error', redirectUrl: '/users/profile/edit', buttonText: 'Back' });
     }
 });
 

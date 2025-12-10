@@ -241,8 +241,13 @@ router.get('/manage-services', async (req, res) => {
 
     try {
         const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
-        const services = await db.collection('services').find().sort({ createdAt: -1 }).toArray();
-        res.render('admin-manage-services', { title: 'Manage Services', services, currentUser: req.session.user });
+        const q = (req.query.q || '').trim();
+        let filter = {};
+        if (q) {
+            filter = { $or: [ { name: { $regex: q, $options: 'i' } }, { description: { $regex: q, $options: 'i' } } ] };
+        }
+        const services = await db.collection('services').find(filter).sort({ createdAt: -1 }).toArray();
+        res.render('admin-manage-services', { title: 'Manage Services', services, currentUser: req.session.user, q });
     } catch (err) {
         console.error('Admin services error:', err);
         res.render('message', { title: 'Error', message: 'Could not load services.', type: 'error', redirectUrl: '/users/admin', buttonText: 'Back' });
@@ -286,14 +291,27 @@ router.post('/manage-services/save', async (req, res) => {
 
         if (serviceId && serviceId !== '') {
             // Update existing service
+            // Prevent duplicate names: check if another service (different _id) has same name (case-insensitive)
+            const dup = await db.collection('services').findOne({ name: { $regex: `^${name}$`, $options: 'i' }, _id: { $ne: new ObjectId(serviceId) } });
+            if (dup) {
+                return res.render('message', { title: 'Duplicate Service', message: 'A service with that name already exists. Please choose a different name.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+            }
+
             await db.collection('services').updateOne(
                 { _id: new ObjectId(serviceId) },
                 { $set: serviceData }
             );
+
             res.redirect('/admin/manage-services?success=Service updated successfully');
         } else {
             // Create new service
             serviceData.createdAt = new Date();
+            // Prevent duplicate names when creating
+            const dup = await db.collection('services').findOne({ name: { $regex: `^${name}$`, $options: 'i' } });
+            if (dup) {
+                return res.render('message', { title: 'Duplicate Service', message: 'A service with that name already exists. Please choose a different name.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+            }
+
             await db.collection('services').insertOne(serviceData);
             res.redirect('/admin/manage-services?success=Service created successfully');
         }
@@ -308,7 +326,25 @@ router.post('/manage-services/delete/:id', async (req, res) => {
 
     try {
         const db = req.app.locals.client.db(req.app.locals.dbName || 'ecommerceDB');
-        await db.collection('services').deleteOne({ _id: new ObjectId(req.params.id) });
+        const svcId = req.params.id;
+        const service = await db.collection('services').findOne({ _id: new ObjectId(svcId) });
+        if (!service) return res.render('message', { title: 'Not Found', message: 'Service not found.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+
+        // Check for any orders that reference this service (any status).
+        const queryVariants = [
+            { serviceId: new ObjectId(svcId) },
+            { serviceId: svcId },
+            { serviceId: service.id },
+            { serviceName: service.name }
+        ].filter(Boolean);
+
+        const referencingOrders = await db.collection('orders').countDocuments({ $or: queryVariants });
+        if (referencingOrders > 0) {
+            return res.render('message', { title: 'Cannot Delete', message: 'This service cannot be deleted because customers have bookings associated with it.', type: 'error', redirectUrl: '/admin/manage-services', buttonText: 'Back' });
+        }
+
+        // Safe to delete
+        await db.collection('services').deleteOne({ _id: new ObjectId(svcId) });
         res.redirect('/admin/manage-services?success=Service deleted successfully');
     } catch (err) {
         console.error('Admin service delete error:', err);

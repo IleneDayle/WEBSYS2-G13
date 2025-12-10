@@ -2,11 +2,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { MongoClient } = require('mongodb');
-const path = require('path');
 const session = require('express-session'); //For user sessions
 require('dotenv').config();
 
 const app = express();
+const path = require('path');
 const PORT = process.env.PORT || 3000;
 
 // Global process-level handlers to log unhandled errors so they appear in the terminal
@@ -28,27 +28,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 // Sitemap and Robots.txt for SEO (BEFORE static middleware)
-app.get('/sitemap.xml', (req, res) => {
-    const sitemapPath = path.join(__dirname, 'public', 'sitemap.xml');
+app.get('/sitemap.xml', (req, res, next) => {
     res.type('application/xml');
+    const sitemapPath = path.join(__dirname, 'public', 'sitemap.xml');
     res.sendFile(sitemapPath, (err) => {
         if (err) {
-            console.error('Error sending sitemap.xml:', err && (err.stack || err));
-            if (!res.headersSent) {
-                // Return a plain-text error so the XML parser doesn't try to parse an HTML error page
-                res.status(500).type('text/plain').send('Could not retrieve sitemap');
-            }
+            // Let the error handler log details and respond appropriately
+            return next(err);
         }
     });
 });
 
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    const robotsTxt = `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /users/login\nDisallow: /users/register\nDisallow: /password/\n\nSitemap: http://localhost:3000/sitemap.xml`;
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const robotsTxt = `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /users/login\nDisallow: /users/register\nDisallow: /password/\n\nSitemap: ${baseUrl}/sitemap.xml`;
     res.send(robotsTxt);
 });
 
-app.use(express.static('public'));
+app.use('/public', express.static('public'));
 
 // Session setup
 app.use(session({

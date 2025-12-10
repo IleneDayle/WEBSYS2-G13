@@ -2,7 +2,7 @@
 <html>
     <head>
         <title><%= title %></title>
-        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             .admin-container {
@@ -186,6 +186,14 @@
                 <% if (typeof success !== 'undefined' && success) { %>
                     <div class="message info"><%= success %></div>
                 <% } %>
+
+                <form method="GET" action="/admin/manage-services" style="margin-bottom:18px; display:flex; gap:8px; align-items:center;">
+                    <input type="search" name="q" placeholder="Search services by name or description" value="<%= typeof q !== 'undefined' ? q : '' %>" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                    <button type="submit" class="add-btn" style="padding:8px 12px;">Search</button>
+                    <% if (q) { %>
+                        <a href="/admin/manage-services" class="add-btn" style="background:#e2e8f0; color:#667eea; padding:8px 12px;">Clear</a>
+                    <% } %>
+                </form>
 
                 <% if (!services || services.length === 0) { %>
                     <div class="message info">No services found. <a href="/admin/manage-services/new" style="color: #667eea; font-weight: 600;">Create one now</a></div>

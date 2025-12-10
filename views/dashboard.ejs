@@ -2,7 +2,7 @@
 <html>
     <head>
         <title><%= title %></title>
-        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
             .stats-grid {
@@ -183,15 +183,15 @@
                 <!-- User Statistics -->
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-number">-</div>
+                        <div class="stat-number"><%= typeof stats !== 'undefined' ? stats.activeOrders : 0 %></div>
                         <div class="stat-label">Active Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">-</div>
+                        <div class="stat-number"><%= typeof stats !== 'undefined' ? stats.totalOrders : 0 %></div>
                         <div class="stat-label">Total Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">-</div>
+                        <div class="stat-number"><%= typeof stats !== 'undefined' ? stats.totalSpent : '₱0.00' %></div>
                         <div class="stat-label">Total Spent</div>
                     </div>
                 </div>

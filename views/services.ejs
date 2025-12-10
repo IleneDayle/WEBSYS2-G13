@@ -2,7 +2,7 @@
 <html>
     <head>
         <title><%= title %></title>
-        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/public/css/styles.css">
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
@@ -18,23 +18,30 @@
             <h1>Book a Service</h1>
 
             <div style="max-width: 720px; margin: 20px auto;">
+                <form method="GET" action="/services/book" style="display:flex; gap:8px; margin-bottom:12px;">
+                    <input type="search" name="q" placeholder="Search services by name or description" value="<%= typeof q !== 'undefined' ? q : '' %>" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
+                    <button type="submit" style="padding:10px 14px; border-radius:8px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none;">Search</button>
+                    <% if (q) { %>
+                        <a href="/services/book" style="padding:10px 14px; border-radius:8px; background:#e2e8f0; color:#667eea; text-decoration:none;">Clear</a>
+                    <% } %>
+                </form>
                 <% services.forEach(function(svc){ %>
                     <div style="background: white; padding: 16px; border-radius: 12px; margin-bottom: 12px; border:1px solid #e2e8f0;">
                         <h3 style="margin-bottom:8px;"><%= svc.name %> — ₱<%= svc.price %></h3>
                         <p style="color:#64748b; margin-bottom:12px;">Fast, reliable laundry service.</p>
                         <form method="POST" action="/services/book" style="display:flex; flex-direction:column; gap:8px;">
-                            <input type="hidden" name="serviceId" value="<%= svc.id %>">
+                            <input type="hidden" name="serviceId" value="<%= svc.id || svc._id %>">
                             <input type="hidden" name="serviceName" value="<%= svc.name %>">
                             <input type="hidden" name="price" value="<%= svc.price %>">
                             <div style="display:flex; gap:8px;">
-                                <input type="date" name="pickupDate" id="pickupDate-<%= svc.id %>" required style="padding:10px; border-radius:8px; border:1px solid #e2e8f0; flex:1;">
+                                <input type="date" name="pickupDate" id="pickupDate-<%= svc.id || svc._id %>" required style="padding:10px; border-radius:8px; border:1px solid #e2e8f0; flex:1;">
                                 <input type="text" name="notes" placeholder="Notes (optional)" style="flex:1; padding:10px; border-radius:8px; border:1px solid #e2e8f0;">
                             </div>
                             <button type="submit" style="width:100%;">Book — ₱<%= svc.price %></button>
                         </form>
                         <script>
                             (function(){
-                                const dateInput = document.getElementById('pickupDate-<%= svc.id %>');
+                                const dateInput = document.getElementById('pickupDate-<%= svc.id || svc._id %>');
                                 if (dateInput) {
                                     // Set minimum date to today
                                     const today = new Date();

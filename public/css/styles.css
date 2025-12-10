@@ -265,6 +265,52 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
+/* Admin table action controls - keep these compact and inline
+   This overrides the global full-width button styles only inside
+   the actions column so other buttons remain wide where intended. */
+.actions-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* reduced vertical gap */
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0;
+}
+.action-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+}
+.action-row select {
+    min-width: 110px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: white;
+    border: 1px solid #cbd5e0;
+    box-shadow: none;
+}
+.actions-cell form {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+.actions-cell button {
+    width: auto !important;
+    padding: 6px 10px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 6px rgba(102,126,234,0.12) !important;
+    font-size: 0.9em !important;
+    margin: 0 !important;
+}
+.actions-cell .btn-refund {
+    padding: 6px 10px !important;
+}
+
+
 /* Dashboard specific styles */
 .dashboard-container {
     max-width: 1200px;

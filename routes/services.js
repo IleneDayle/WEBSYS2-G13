@@ -12,7 +12,12 @@ router.get('/book', async (req, res) => {
         const db = client.db(dbName);
 
         // Try to load services from DB, otherwise fallback to hard-coded catalog
-        const servicesFromDb = await db.collection('services').find().toArray();
+        const q = (req.query.q || '').trim();
+        let filter = {};
+        if (q) {
+            filter = { $or: [ { name: { $regex: q, $options: 'i' } }, { description: { $regex: q, $options: 'i' } } ] };
+        }
+        const servicesFromDb = await db.collection('services').find(filter).toArray();
 
         const defaultServices = [
             { id: 'wash-fold', name: 'Wash & Fold', price: 180 },
@@ -22,7 +27,7 @@ router.get('/book', async (req, res) => {
 
         const services = (servicesFromDb && servicesFromDb.length > 0) ? servicesFromDb : defaultServices;
 
-        res.render('services', { title: 'Book Service', services, user: req.session.user });
+        res.render('services', { title: 'Book Service', services, user: req.session.user, q });
     } catch (err) {
         console.error('Services load error:', err);
         res.render('message', { title: 'Error', message: 'Could not load services.', type: 'error', redirectUrl: '/users/dashboard', buttonText: 'Back' });
