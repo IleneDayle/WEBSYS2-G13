@@ -302,7 +302,9 @@ router.post('/manage-services/save', async (req, res) => {
                 { $set: serviceData }
             );
 
-            res.redirect('/admin/manage-services?success=Service updated successfully');
+            // Fetch updated services list and re-render with success message
+            const services = await db.collection('services').find().sort({ createdAt: -1 }).toArray();
+            return res.render('admin-manage-services', { title: 'Manage Services', services, currentUser: req.session.user, success: '✅ Service updated successfully!', q: '' });
         } else {
             // Create new service
             serviceData.createdAt = new Date();
@@ -313,7 +315,9 @@ router.post('/manage-services/save', async (req, res) => {
             }
 
             await db.collection('services').insertOne(serviceData);
-            res.redirect('/admin/manage-services?success=Service created successfully');
+            // Fetch updated services list and re-render with success message
+            const services = await db.collection('services').find().sort({ createdAt: -1 }).toArray();
+            return res.render('admin-manage-services', { title: 'Manage Services', services, currentUser: req.session.user, success: '✅ Service created successfully!', q: '' });
         }
     } catch (err) {
         console.error('Admin service save error:', err);
