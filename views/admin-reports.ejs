@@ -203,6 +203,39 @@
                     <a href="/admin/reports" class="active">Reports</a>
                 </div>
 
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <h3 style="margin-top: 0; margin-bottom: 12px; color: #2d3748; font-size: 1em;">Filter Reports</h3>
+                    <form method="GET" action="/admin/reports" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+                        <div style="flex: 1; min-width: 160px;">
+                            <label for="status" style="display: block; margin-bottom: 4px; font-weight: 600; color: #333; font-size: 0.85em;">Status</label>
+                            <select name="status" id="status" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9em;">
+                                <option value="">All</option>
+                                <option value="pending" <%= filterStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="processing" <%= filterStatus === 'processing' ? 'selected' : '' %>>Processing</option>
+                                <option value="completed" <%= filterStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+                                <option value="cancelled" <%= filterStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1; min-width: 160px;">
+                            <label for="service" style="display: block; margin-bottom: 4px; font-weight: 600; color: #333; font-size: 0.85em;">Service</label>
+                            <input type="text" name="service" id="service" placeholder="Search..." value="<%= filterService %>" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9em;">
+                        </div>
+                        <div style="flex: 1; min-width: 130px;">
+                            <label for="dateFrom" style="display: block; margin-bottom: 4px; font-weight: 600; color: #333; font-size: 0.85em;">From</label>
+                            <input type="date" name="dateFrom" id="dateFrom" value="<%= filterDateFrom %>" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9em;">
+                        </div>
+                        <div style="flex: 1; min-width: 130px;">
+                            <label for="dateTo" style="display: block; margin-bottom: 4px; font-weight: 600; color: #333; font-size: 0.85em;">To</label>
+                            <input type="date" name="dateTo" id="dateTo" value="<%= filterDateTo %>" style="width: 100%; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9em;">
+                        </div>
+                        <button type="submit" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9em;">Apply</button>
+                        <a href="/admin/reports" style="padding: 8px 16px; background: #e2e8f0; color: #667eea; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.9em;">Clear</a>
+                            <a href="/admin/reports/export/excel?<%= new URLSearchParams({ status: filterStatus || '', service: filterService || '', dateFrom: filterDateFrom || '', dateTo: filterDateTo || '' }).toString() %>" style="padding: 8px 16px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.9em;">📊 Export Excel</a>
+                            <a href="/admin/reports/export/pdf?<%= new URLSearchParams({ status: filterStatus || '', service: filterService || '', dateFrom: filterDateFrom || '', dateTo: filterDateTo || '' }).toString() %>" style="padding: 8px 16px; background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 0.9em;">📄 Export PDF</a>
+                    </form>
+                </div>
+
                 <!-- Key Metrics -->
                 <div class="reports-stats">
                     <div class="stat-card">
